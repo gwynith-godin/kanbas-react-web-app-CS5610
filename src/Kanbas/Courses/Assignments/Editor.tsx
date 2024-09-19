@@ -23,18 +23,18 @@ export default function AssignmentEditor() {
         <br/>
         <tr>
           <td align="right" valign="top">
-          <label htmlFor="wd-assignment-group"> Assignment Group </label><br/>
+          <label htmlFor="wd-group"> Assignment Group </label><br/>
           </td>
-          <select id="wd-assignments">
+          <select id="wd-group">
           <option value="Assignments">Assignments</option>
           </select>
         </tr>
         <br/>
         <tr>
           <td align="right" valign="top">
-          <label htmlFor="wd-display-grade"> Display Grade as </label><br/>
+          <label htmlFor="wd-display-grade-as"> Display Grade as </label><br/>
           </td>
-          <select id="wd-grade">
+          <select id="wd-display-grade-as">
           <option value="Grade">Percentage</option>
           </select>
         </tr>
@@ -43,7 +43,7 @@ export default function AssignmentEditor() {
           <td align="right" valign="top">
           <label htmlFor="wd-submission-type"> Submission Type </label><br/>
           </td>
-          <select id="wd-submission">
+          <select id="wd-submission-type">
           <option value="Submission">Online</option>
           </select>
         </tr>
@@ -53,20 +53,20 @@ export default function AssignmentEditor() {
           <label>Online Entry Options</label><br/>
         </td>
         <br/>
-          <input type="checkbox" name="check-entry" id="wd-chkbox-text-entry"/>
-          <label htmlFor="wd-chkbox-text-entry">Text Entry</label><br/>
+          <input type="checkbox" name="check-entry" id="wd-text-entry"/>
+          <label htmlFor="wd-text-entry">Text Entry</label><br/>
 
-          <input type="checkbox" name="check-entry" id="wd-chkbox-url"/>
-          <label htmlFor="wd-chkbox-url">Website URL</label><br/>
+          <input type="checkbox" name="check-entry" id="wd-website-url"/>
+          <label htmlFor="wd-website-url">Website URL</label><br/>
 
-          <input type="checkbox" name="check-entry" id="wd-chkbox-media"/>
-          <label htmlFor="wd-chkbox-media">Media Recordings</label><br/>
+          <input type="checkbox" name="check-entry" id="wd-media-recordings"/>
+          <label htmlFor="wd-media-recordings">Media Recordings</label><br/>
 
-          <input type="checkbox" name="check-entry" id="wd-chkbox-stud-ann"/>
-          <label htmlFor="wd-chkbox-stud-ann">Student Annotations</label><br/>
+          <input type="checkbox" name="check-entry" id="wd-student-annotation"/>
+          <label htmlFor="wd-student-annotation">Student Annotations</label><br/>
 
-          <input type="checkbox" name="check-entry" id="wd-chkbox-file-upload"/>
-          <label htmlFor="wd-chkbox-file-upload">File Uploads</label>
+          <input type="checkbox" name="check-entry" id="wd-file-upload"/>
+          <label htmlFor="wd-file-upload">File Uploads</label>
       </tr>
       <br />
       <tr>
@@ -78,9 +78,9 @@ export default function AssignmentEditor() {
         <br />
       <tr>
       <td align="right" valign="top">
-        <label htmlFor="wd-due">Due</label>
+        <label htmlFor="wd-due-date">Due</label>
         </td>
-        <input type="date" id="wd-due" name="start-date" value="2024-05-13"/>
+        <input type="date" id="wd-due-date" name="start-date" value="2024-05-13"/>
         </tr>
         <tr>
       <td align="right" valign="top">
@@ -95,9 +95,10 @@ export default function AssignmentEditor() {
         <input type="date" id="wd-available-until" name="start-date" value="2024-05-20"/>
         </tr>
         <br />
-        <tr>
-          <button>Cancel</button> <button>Save</button>
-        </tr>
       </table>
+      <div id="wd-name">
+      <hr />
+        <button>Cancel</button> <button>Save</button>
+      </div>
     </div>
 );}
