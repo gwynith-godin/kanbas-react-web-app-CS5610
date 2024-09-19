@@ -63,27 +63,81 @@ export default function Lab1() {
         </div>
         <div id="wd-tables">
         <h4>Table Tag</h4>
-        <table border={1} width="100%">	{/* table, border, width */}
-          <thead>					{/* table headings */}
-            <tr>						{/* table row */}
-              <th>Quiz</th>				{/* table heading*/}
+        <table border={1} width="100%">
+          <thead>
+            <tr>
+              <th>Quiz</th>
               <th>Topic</th>
               <th>Date</th>
               <th>Grade</th>
             </tr>
           </thead>
-          <tbody>					{/* table body */}
-            <tr>						{/* table row */}
-              <td>Q1</td>				{/* table data / cell */}
+          <tbody>
+            <tr>
+              <td>Q1</td>
               <td>HTML</td>
               <td>2/3/21</td>
               <td>85</td>
             </tr>
-          </tbody>
-          <tfoot>					{/* table row */}
             <tr>
-              <td colSpan={3}>Average</td>	{/* column span */}
+              <td>Q2</td>
+              <td>CSS</td>
+              <td>2/10/21</td>
               <td>90</td>
+            </tr>
+            <tr>
+              <td>Q3</td>
+              <td>JavaScript</td>
+              <td>2/17/21</td>
+              <td>95</td>
+            </tr>
+            <tr>
+              <td>Q4</td>
+              <td>React</td>
+              <td>2/22/21</td>
+              <td>95</td>
+            </tr>
+            <tr>
+              <td>Q5</td>
+              <td>XML</td>
+              <td>3/1/21</td>
+              <td>90</td>
+            </tr>
+            <tr>
+              <td>Q6</td>
+              <td>Python</td>
+              <td>3/10/21</td>
+              <td>90</td>
+            </tr>
+            <tr>
+              <td>Q7</td>
+              <td>TypeScript</td>
+              <td>3/17/21</td>
+              <td>92</td>
+            </tr>
+            <tr>
+              <td>Q8</td>
+              <td>Java</td>
+              <td>3/25/21</td>
+              <td>92</td>
+            </tr>
+            <tr>
+              <td>Q9</td>
+              <td>C#</td>
+              <td>3/30/21</td>
+              <td>92</td>
+            </tr>
+            <tr>
+              <td>Q10</td>
+              <td>C++</td>
+              <td>4/07/21</td>
+              <td>94</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={3}>Average</td>
+              <td>91.5</td>
             </tr>
           </tfoot>
         </table>
@@ -115,7 +169,33 @@ export default function Lab1() {
         <label htmlFor="wd-text-fields-last-name">Last name:</label>
         <input type="text" id="wd-text-fields-last-name" placeholder="Doe"
         value="Wonderland" title="The last name" />
-        {/* copy rest of form elements here  */}
+        
+        <div>
+        <h4>Other HTML field types</h4>
+
+        <label htmlFor="wd-text-fields-email"> Email: </label>
+        <input type="email"
+            placeholder="jdoe@somewhere.com"
+            id="wd-text-fields-email"/><br/>
+
+        <label htmlFor="wd-text-fields-salary-start"> Starting salary:
+        </label>
+        <input type="number"
+            id="wd-text-fields-salary-start"
+            placeholder="1000"
+            value="100000"/><br/>
+
+        <label htmlFor="wd-text-fields-rating"> Rating: </label>
+        <input type="range" id="wd-text-fields-rating"
+            placeholder="Doe"
+            max="5"
+            value="4"/><br/>
+
+        <label htmlFor="wd-text-fields-dob"> Date of birth: </label>
+        <input type="date"
+            id="wd-text-fields-dob"
+            value="2000-01-21"/><br/>    
+        </div>
         </form>
         </div>
         <div>
@@ -187,35 +267,10 @@ export default function Lab1() {
         </select>
         </div>
         <div>
-        <h4>Other HTML field types</h4>
-
-        <label htmlFor="wd-text-fields-email"> Email: </label>
-        <input type="email"
-            placeholder="jdoe@somewhere.com"
-            id="wd-text-fields-email"/><br/>
-
-        <label htmlFor="wd-text-fields-salary-start"> Starting salary:
-        </label>
-        <input type="number"
-            id="wd-text-fields-salary-start"
-            placeholder="1000"
-            value="100000"/><br/>
-
-        <label htmlFor="wd-text-fields-rating"> Rating: </label>
-        <input type="range" id="wd-text-fields-rating"
-            placeholder="Doe"
-            max="5"
-            value="4"/><br/>
-
-        <label htmlFor="wd-text-fields-dob"> Date of birth: </label>
-        <input type="date"
-            id="wd-text-fields-dob"
-            value="2000-01-21"/><br/>    
-        </div>
-        <div>
         <h4>Anchor tag</h4>
-        Please
-        <a id="wd-lipsum" href="https://www.lipsum.com">click here</a>
-        to get dummy text<br/>    
+        Please <a id="wd-lipsum" href="https://www.lipsum.com"> click here </a>
+        to get dummy text<br/>   
+        Please <a id="wd-github" href="https://github.com/gwynith-godin/kanbas-react-web-app-CS5610"> click here </a>
+        to view my GitHub<br/> 
         </div>    
       </div>);}
