@@ -274,5 +274,9 @@ export default function Lab1() {
         to get dummy text<br/>   
         Please <a id="wd-github" href="https://github.com/gwynith-godin/kanbas-react-web-app-CS5610"> click here </a>
         to view my GitHub<br/> 
-        </div>    
+        </div>  
+
+        <label><input type="radio" name="color" />Yellow</label>
+        <label><input type="radio" name="genre" />Comedy</label>
+        <label><input type="radio" name="color" />Red</label>    
       </div>);}
