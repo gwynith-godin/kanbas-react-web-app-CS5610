@@ -1,6 +1,7 @@
 import { FaPlus } from "react-icons/fa6";
 import { MdDoNotDisturbAlt } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
+import { FaSearch } from "react-icons/fa";
 
 export default function AssignmentControls() {
     return (
@@ -15,13 +16,15 @@ export default function AssignmentControls() {
         <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
           Group </button>
         </div>
-        <div>
+        <div className="input-group" style={{ width: "200px" }}>
+            <span className="input-group-text bg-white border-end-0">
+                <FaSearch />
+            </span>
             <input 
                 id="wd-search-input"
                 type="text"
-                className="form-control me-5 float-left"
+                className="form-control border-start-0"
                 placeholder="Search..."
-                style={{ width: "200px" }} 
             />
             </div>
         

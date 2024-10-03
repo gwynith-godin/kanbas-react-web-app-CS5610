@@ -3,19 +3,57 @@ export default function Profile() {
   return (
     <div id="wd-profile-screen">
       <h3>Profile</h3>
-      <input id="wd-username" value="alice" placeholder="username" /><br/>
-      <input id="wd-password" value="123" placeholder="password"
-             type="password" /><br/>
-      <input id="wd-firstname" value="Alice" placeholder="First Name" /><br/>
-      <input id="wd-lastname" value="Wonderland" placeholder="Last Name" /><br/>
-      <input id="wd-dob" value="2000-01-01" type="date" /><br/>
-      <input id="wd-email" value="alice@wonderland" type="email" /><br/>
-      <select id="wd-role">
+      <input id="wd-username"
+             placeholder="alice"
+             className="form-control mb-2"/>
+      <input id="wd-password"
+             placeholder="123"
+             className="form-control mb-2"/>
+      <input id="wd-firstname"
+             value = "Alice"
+             placeholder="First Name"
+             className="form-control mb-2"/>
+      <input id="wd-lastname"
+             value = "Wonderland"
+             placeholder="Last Name"
+             className="form-control mb-2"/>
+      <input id="wd-dob"
+             value = "yyyy-mm-dd"
+             placeholder="DOB"
+             type = "date"
+             className="form-control mb-2"/>
+      <input id="wd-email"
+             value = "alice@wonderland.com"
+             placeholder="email"
+             type = "email"
+             className="form-control mb-2"/>
+      <select id="wd-user"
+             value = "User"
+             className="form-control mb-2">
         <option value="USER">User</option>
         <option value="ADMIN">Admin</option>
         <option value="FACULTY">Faculty</option>
         <option value="STUDENT">Student</option>
-      </select><br/>
-      <Link to="/Kanbas/Account/Signin" >Sign out</Link>
+      </select>
+      <Link id="wd-signout-btn"
+            to="/Kanbas/Account/Signin"
+            className="btn btn-primary wd-signout w-100">
+            Sign Out </Link>
     </div>
 );}
+
+
+<div id="wd-signin-screen">
+      <h1>Sign in</h1>
+      <input id="wd-username"
+             placeholder="username"
+             className="form-control mb-2"/>
+      <input id="wd-password"
+             placeholder="password" type="password"
+             className="form-control mb-2"/>
+      <Link id="wd-signin-btn"
+            to="/Kanbas/Account/Profile"
+            className="btn btn-primary w-100">
+            Sign in </Link>
+      <Link id="wd-signup-link" to="/Kanbas/Account/Signup">Sign up</Link>
+    </div>
