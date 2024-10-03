@@ -6,12 +6,34 @@ export default function AssignmentEditor() {
         <div>
           <div className="assignment-name">
             <label htmlFor="assignment-name">Assignment Name</label>
-            <input type="text" className="form-control mb-3" id="assignment-name" />
+            <input type="text" 
+            className="form-control mb-3" 
+            id="assignment-name" 
+            placeholder="A1"/>
           </div>
 
-          <div className="assignment-text-box">
-            <input type="text" className="form-control p-6 mb-4" id="assignment-name-large" style={{ height: '200px' }} />
+          <div className="form-group mb-3">
+          <div 
+              className="form-control" 
+              contentEditable 
+              style={{ minHeight: '200px', border: '1px solid #ced4da', padding: '10px' }}
+          >   The assignment is 
+              <span style={{ color: 'red' }}> available online.
+              </span><br />
+              <span>
+                  Submit a link to your landing page of your Web Application running on Netlify.<br />
+                  The landing page should include the following:<br />
+              </span>
+              <ul>
+              <li>Your full name and section</li>
+              <li>Links to each of the Lab assignments</li>
+              <li>Link to Kanbas application</li>
+              <li>Links to all relevant source code repositories</li>
+              </ul>
+              The Kanbas application should include a link to navigate back to the landing page.
           </div>
+      </div>
+
 
           <div className="form-group row">
             <div className="col-sm-12 d-flex justify-content-end">
@@ -40,7 +62,6 @@ export default function AssignmentEditor() {
             </ul>
           </div>
 
-          {/* Submission Type Section */}
           <form>
             <div className="container mt-3 d-flex justify-content-end">
               <label className="me-1">Submission Type</label>
@@ -69,8 +90,8 @@ export default function AssignmentEditor() {
               <label className="me-1">Assign</label>
               <div className="form-group form-group-border">
                 <label className="wd-checkbox-bold">Assign to</label>
-                  <div className="form-control p-6 mb-3 d-flex align-items-center" style={{ width: '300px', height: '35px', textAlign: 'left' }}>
-                    <div className="tag d-flex align-items-center" style={{ background: '#f1f1f1', borderRadius: '15px', padding: '2px 10px', display: 'inline-flex' }}>
+                  <div className="form-control p-6 mb-3 d-flex align-items-center" style={{ height: '35px', textAlign: 'left' }}>
+                    <div className="tag d-flex align-items-center" style={{ background: '#f1f1f1', borderRadius: '0px', padding: '2px 10px', display: 'inline-flex' }}>
                       Everyone
                       <button 
                         type="button" 
@@ -82,19 +103,29 @@ export default function AssignmentEditor() {
                   </div>
 
                 <label className="wd-checkbox-bold">Due</label>
-                <div className="input-group mb-2">
+                <div className="input-group">
                   <div className="input-group">
-                    <input type="text" className="form-control" placeholder="May 13, 2024, 11:59 PM" aria-label="Recipient's username" aria-describedby="basic-addon2" style={{ width: '300px' }} />
+                    <input type="text" 
+                    className="form-control" 
+                    placeholder="May 13, 2024, 11:59 PM" 
+                    aria-label="Recipient's username" 
+                    aria-describedby="basic-addon2" 
+                    // style={{ width: '300px' }} 
+                    />
                     <span className="input-group-text" id="basic-addon2"><FaCalendarAlt /></span>
                   </div>
                 </div>
 
-                <div className="container">
+                <div className="container mt-3">
                   <div className="row">
                     <div className="col-sm">
                       <label className="wd-checkbox-bold">Available From</label>
                       <div className="input-group">
-                        <input type="text" className="form-control" placeholder="May 6, 2024, 12:00 AM" aria-label="Recipient's username" aria-describedby="basic-addon2" />
+                        <input type="text" 
+                        className="form-control" 
+                        placeholder="May 6, 2024, 12:00 AM" 
+                        aria-label="Recipient's username" 
+                        aria-describedby="basic-addon2" />
                         <span className="input-group-text" id="basic-addon2"><FaCalendarAlt /></span>
                       </div>
                     </div>

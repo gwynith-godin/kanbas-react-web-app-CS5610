@@ -16,7 +16,7 @@ export default function AssignmentControls() {
         <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
           Group </button>
         </div>
-        <div className="input-group" style={{ width: "200px" }}>
+        <div className="input-group" style={{ width: "300px" }}>
             <span className="input-group-text bg-white border-end-0">
                 <FaSearch />
             </span>

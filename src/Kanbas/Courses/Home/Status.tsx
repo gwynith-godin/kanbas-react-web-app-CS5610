@@ -9,7 +9,7 @@ import { CiBellOn } from "react-icons/ci";
 
 export default function CourseStatus() {
   return (
-    <div id="wd-course-status" style={{ width: "300px" }}>
+    <div id="wd-course-status" style={{ width: "300px" }} className="p-1">
       <h2>Course Status</h2>
       <div className="d-flex">
         <div className="w-50 pe-1">
