@@ -1,47 +1,50 @@
+import ModulesControls from "../Modules/ModulesControls";
+import LessonControlButtons from "../Modules/LessonControlButtons";
+import AssignmentControls from "./AssignmentControls";
+import { BsGripVertical } from "react-icons/bs";
+import { FaPlus } from "react-icons/fa6";
+import GreenCheckmark from "../Modules/GreenCheckmark";
+
+
+
 export default function Assignments() {
     return (
-      <div id="wd-assignments">
-        <input id="wd-search-assignment"
-               placeholder="Search for Assignments" />
-        <button id="wd-add-assignment-group">+ Group</button>
-        <button id="wd-add-assignment">+ Assignment</button>
-        <h3 id="wd-assignments-title">
-          ASSIGNMENTS 40% of Total <button>+</button>
-        </h3>
-        <ul id="wd-assignment-list">
-          <li className="wd-assignment-list-item">
-            <a className="wd-assignment-link"
-              href="#/Kanbas/Courses/1234/Assignments/123">
-              A1 - ENV + HTML
-            </a>
-          </li>
-          <li className="wd-assignment-list-item" style={{listStyleType: 'none'}}>
-            Multiple Modules | <strong>Not available until</strong> May 6 at 12:00am |
-            <br />
-            <strong>Due</strong> May 13 at 11:59pm | 100 pts
-          </li>
-          <li className="wd-assignment-list-item">
-            <a className="wd-assignment-link"
-              href="#/Kanbas/Courses/1234/Assignments/123">
-              A2 - CSS + BOOTSTRAP
-            </a>
-          </li>
-          <li className="wd-assignment-list-item" style={{listStyleType: 'none'}}>
-            Multiple Modules | <strong>Not available until</strong> May 13 at 12:00am |
-            <br />
-            <strong>Due</strong> May 20 at 11:59pm | 100 pts
-          </li>
-          <li className="wd-assignment-list-item">
-            <a className="wd-assignment-link"
-              href="#/Kanbas/Courses/1234/Assignments/123">
-              A3 - JAVASCRIPT + REACT
-            </a>
-          </li>
-          <li className="wd-assignment-list-item" style={{listStyleType: 'none'}}>
-            Multiple Modules | <strong>Not available until</strong> May 20 at 12:00am |
-            <br />
-            <strong>Due</strong> May 27 at 11:59pm | 100 pts
-          </li>
-        </ul>
-      </div>
+      <div>
+      <ul id="wd-modules" className="list-group rounded-0">
+      <AssignmentControls /><br /><br /><br />
+      <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
+          <div className="wd-title p-3 ps-2 bg-secondary">
+            <BsGripVertical className="me-2 fs-3" />
+            Week 1
+            <LessonControlButtons/>
+          </div>
+          <ul className="wd-lessons list-group rounded-0">
+            <li className="wd-lesson list-group-item p-3 ps-1">
+              <BsGripVertical className="me-2 fs-3" />
+              LEARNING OBJECTIVES
+              <LessonControlButtons />
+            </li>
+            <li className="wd-lesson list-group-item p-3 ps-1">
+              <BsGripVertical className="me-2 fs-3" />
+              Introduction to the course
+              <LessonControlButtons />
+            </li>
+            <li className="wd-lesson list-group-item p-3 ps-1">
+              <BsGripVertical className="me-2 fs-3" />
+              Learn what is Web Development 
+              <LessonControlButtons />
+              </li>
+            <li className="wd-lesson list-group-item p-3 ps-1"> 
+            <BsGripVertical className="me-2 fs-3" />
+            LESSON 1 
+            <LessonControlButtons />
+            </li>
+            <li className="wd-lesson list-group-item p-3 ps-1"> 
+            <BsGripVertical className="me-2 fs-3" />
+            LESSON 2
+            <LessonControlButtons />
+            </li>
+          </ul>
+        </li>
+      </ul> </div>
   );}  
