@@ -34,6 +34,7 @@ Normal text renders inline
   color: "white",}}> render inline</span> 
   with the rest of the content
   <br /><br /><br />
+
 </div>
     );
 }

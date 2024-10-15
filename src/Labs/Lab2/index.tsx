@@ -131,7 +131,10 @@ export default function Lab2() {
   <div id="wd-bootstrap-navigation">
   <BootstrapNavigation />
   </div>
+
+  
 </div>
+
     );
   }
   
