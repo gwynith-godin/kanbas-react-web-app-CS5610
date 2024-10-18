@@ -1,6 +1,4 @@
 import { FaPlus } from "react-icons/fa6";
-import { MdDoNotDisturbAlt } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { FaSearch } from "react-icons/fa";
 
 export default function AssignmentControls() {
