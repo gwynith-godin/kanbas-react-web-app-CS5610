@@ -1,18 +1,104 @@
-import { FaCalendarAlt } from "react-icons/fa";
-import * as db from "../../Database";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation, useParams } from "react-router-dom";
+import { addAssignment, updateAssignment } from "./reducer";
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams();
-  const assignments = db.assignments;
+  const { assignments } = useSelector(
+    (state: any) => state.assignmentReducer || []
+  );
   const { pathname } = useLocation();
+  const dispatch = useDispatch();
+  
+  const setAssignment = () => {
+    if (aid === "new"){
+      // new Date().getTime().toString()
+      return { id: new Date().getTime().toString(), course: cid };
+  
+    }
+    else {
+      return assignments.find(
+        (assignment: any) =>
+          assignment.course === cid && assignment._id === aid
+      )
+    }
+  }
+
+  const assignment = useMemo(setAssignment, [aid, cid, assignments]);
+
+
+  // State to manage form values
+  const [formValues, setFormValues] = useState({
+    title: '',
+    description: '',
+    availableFrom: '',
+    due: '',
+    points: '',
+  });
+  // console.log(assignment)
+  console.log(formValues)
+
+  const fmtDate = (inputDate: string) => {
+    // console.log(inputDate)
+    if (!inputDate) return '';
+    const d = new Date(inputDate);
+    return (new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString()).slice(0, -1)
+  }
+
+  // Initialize form values when assignment is loaded
+  useEffect(() => {
+    if (assignment) {
+      setFormValues({
+        title: assignment.title || '',
+        description: assignment.description || '',
+        availableFrom: assignment.availableFrom || '',
+        due: assignment.due || '',
+        points: assignment.points || '',
+      });
+    }
+  }, [assignment]);
+
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target as HTMLInputElement;
+    console.log(name);
+    console.log(value);
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
+  };
+
+  const handleInputChangeDate = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target as HTMLInputElement;
+    const dateValue = new Date(value).toLocaleString();
+    setFormValues({
+      ...formValues,
+      [name]: dateValue,
+    });
+  };
+
+  // Handle assignment edit
+  const handleEditAssignment = () => {
+    if (assignment) {
+      
+      if (aid === "new") {
+        console.log(formValues)
+        console.log(assignment)
+        dispatch(addAssignment({ ...formValues, id: new Date().getTime().toString(), course: cid }));
+      }
+      else {
+        dispatch(updateAssignment({ ...assignment, ...formValues }));
+      }
+    }
+  };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+    >
 
-      {assignments
-        .filter((assignment: any) => assignment.course === cid && assignment._id === aid)
-        .map((assignment: any) => (
           <div>
             <div className="assignment-name" key={assignment._id}>
               <label htmlFor="assignment-name">Assignment Name</label>
@@ -20,15 +106,20 @@ export default function AssignmentEditor() {
                 type="text"
                 className="form-control mb-3"
                 id="assignment-name"
-                value={assignment.title} />
+                name="title"
+                defaultValue={formValues.title}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="form-group mb-3">
-              <div
-                className="form-control"
-                contentEditable
-                style={{ minHeight: '200px', border: '1px solid #ced4da', padding: '10px' }}>
-                {assignment.description}
-              </div>
+            <textarea
+              className="form-control"
+              id="assignment-description"
+              name="description"
+              style={{ minHeight: '200px', border: '1px solid #ced4da', padding: '10px' }}
+              value={formValues.description}
+              onChange={handleInputChange}
+            />
             </div>
             <div className="container-fluid d-flex justify-content-end">
               <div className="form-group row">
@@ -38,8 +129,8 @@ export default function AssignmentEditor() {
                     type="text"
                     className="form-control p-6 mb-3"
                     id="assignment-points"
-                    value={assignment.points}
-                    style={{ width: '350px' }}
+                    defaultValue={assignment.points}
+                    style={{ width: "350px" }}
                   />
                 </div>
 
@@ -51,51 +142,130 @@ export default function AssignmentEditor() {
                     type="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
-                    style={{ width: '350px', height: '35px', textAlign: 'left' }}>
+                    style={{
+                      width: "350px",
+                      height: "35px",
+                      textAlign: "left",
+                    }}
+                  >
                     ASSIGNMENTS
                   </button>
                   <ul className="dropdown-menu">
-                    <li><a id="wd-assignments-btn" className="dropdown-item" href="#">ASSIGNMENTS</a></li>
+                    <li>
+                      <a
+                        id="wd-assignments-btn"
+                        className="dropdown-item"
+                        href="#"
+                      >
+                        ASSIGNMENTS
+                      </a>
+                    </li>
                   </ul>
                 </div>
                 <div className="col-sm-12 d-flex justify-content-end">
                   <label className="me-3">Display Grade as</label>
-                  <button className="form-control p-6 mb-3 dropdown-toggle d-flex justify-content-between align-items-center"
+                  <button
+                    className="form-control p-6 mb-3 dropdown-toggle d-flex justify-content-between align-items-center"
                     id="assignment-name-large"
                     type="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
-                    style={{ width: '350px', height: '35px', textAlign: 'left' }}>
+                    style={{
+                      width: "350px",
+                      height: "35px",
+                      textAlign: "left",
+                    }}
+                  >
                     Percentage
                   </button>
                   <ul className="dropdown-menu">
-                    <li><a
-                      id="wd-percentage-btn"
-                      className="dropdown-item"
-                      href="#">Percentage</a></li>
+                    <li>
+                      <a
+                        id="wd-percentage-btn"
+                        className="dropdown-item"
+                        href="#"
+                      >
+                        Percentage
+                      </a>
+                    </li>
                   </ul>
                 </div>
-                <form className="container-fluid mt-3 d-flex justify-content-end" >
+                <form className="container-fluid mt-3 d-flex justify-content-end">
                   <label className="me-3">Submission Type</label>
                   <div className="form-group form-group-border">
-                    <button className="form-control p-6 mb-3 dropdown-toggle d-flex justify-content-between align-items-center"
+                    <button
+                      className="form-control p-6 mb-3 dropdown-toggle d-flex justify-content-between align-items-center"
                       id="assignment-name-large"
                       type="button"
                       data-bs-toggle="dropdown"
-                      aria-expanded="false" style={{ width: '300px', height: '35px', textAlign: 'left' }}>
+                      aria-expanded="false"
+                      style={{
+                        width: "300px",
+                        height: "35px",
+                        textAlign: "left",
+                      }}
+                    >
                       Online
                     </button>
                     <ul className="dropdown-menu">
-                      <li><a id="wd-assignments-btn" className="dropdown-item" href="#">Online</a></li>
+                      <li>
+                        <a
+                          id="wd-assignments-btn"
+                          className="dropdown-item"
+                          href="#"
+                        >
+                          Online
+                        </a>
+                      </li>
                     </ul>
 
-                    <label className="wd-checkbox-bold">Online Entry Options</label><br /><br />
+                    <label className="wd-checkbox-bold">
+                      Online Entry Options
+                    </label>
+                    <br />
+                    <br />
                     <div className="checkbox">
-                      <label><input type="checkbox" className="me-2" /><span className="wd-checkbox-regular">Text Entry</span><br /></label><br /><br />
-                      <label><input type="checkbox" className="me-2" /><span className="wd-checkbox-regular">Website URL</span><br /></label><br /><br />
-                      <label><input type="checkbox" className="me-2" /><span className="wd-checkbox-regular">Media Recordings</span><br /></label><br /><br />
-                      <label><input type="checkbox" className="me-2" /><span className="wd-checkbox-regular">Student Annotation</span><br /></label><br /><br />
-                      <label><input type="checkbox" className="me-2" /><span className="wd-checkbox-regular">File Uploads</span><br /></label><br /><br />
+                      <label>
+                        <input type="checkbox" className="me-2" />
+                        <span className="wd-checkbox-regular">Text Entry</span>
+                        <br />
+                      </label>
+                      <br />
+                      <br />
+                      <label>
+                        <input type="checkbox" className="me-2" />
+                        <span className="wd-checkbox-regular">Website URL</span>
+                        <br />
+                      </label>
+                      <br />
+                      <br />
+                      <label>
+                        <input type="checkbox" className="me-2" />
+                        <span className="wd-checkbox-regular">
+                          Media Recordings
+                        </span>
+                        <br />
+                      </label>
+                      <br />
+                      <br />
+                      <label>
+                        <input type="checkbox" className="me-2" />
+                        <span className="wd-checkbox-regular">
+                          Student Annotation
+                        </span>
+                        <br />
+                      </label>
+                      <br />
+                      <br />
+                      <label>
+                        <input type="checkbox" className="me-2" />
+                        <span className="wd-checkbox-regular">
+                          File Uploads
+                        </span>
+                        <br />
+                      </label>
+                      <br />
+                      <br />
                     </div>
                   </div>
                 </form>
@@ -103,16 +273,33 @@ export default function AssignmentEditor() {
                   <label className="me-3">Assign</label>
                   <div className="form-group form-group-border">
                     <label className="wd-checkbox-bold">Assign to</label>
-                    <div className="form-control p-6 mb-3 d-flex align-items-center"
-                      style={{ width: '100%', height: '35px', textAlign: 'left' }}>
-                      <div className="tag d-flex align-items-center"
-                        style={{ background: '#f1f1f1', borderRadius: '0px', padding: '2px 10px', display: 'inline-flex' }}>
+                    <div
+                      className="form-control p-6 mb-3 d-flex align-items-center"
+                      style={{
+                        width: "100%",
+                        height: "35px",
+                        textAlign: "left",
+                      }}
+                    >
+                      <div
+                        className="tag d-flex align-items-center"
+                        style={{
+                          background: "#f1f1f1",
+                          borderRadius: "0px",
+                          padding: "2px 10px",
+                          display: "inline-flex",
+                        }}
+                      >
                         Everyone
                         <button
                           type="button"
                           className="ms-2 btn-close"
                           aria-label="Close"
-                          style={{ fontSize: '12px', padding: '0', marginLeft: '5px' }}
+                          style={{
+                            fontSize: "12px",
+                            padding: "0",
+                            marginLeft: "5px",
+                          }}
                         />
                       </div>
                     </div>
@@ -120,28 +307,41 @@ export default function AssignmentEditor() {
                     <label className="wd-checkbox-bold">Due</label>
                     <div className="input-group">
                       <input
-                        type="text"
+                        type="datetime-local"
                         className="form-control"
-                        placeholder={assignment.due}
+                        name="due"
+                        value={fmtDate(formValues.due)}
                         aria-label="Due date"
                         aria-describedby="basic-addon2"
+                        onChange={handleInputChangeDate}
                       />
-                      <span className="input-group-text" id="basic-addon2"><FaCalendarAlt /></span>
+                      <span className="input-group-text" id="basic-addon2">
+                        {/* <FaCalendarAlt /> */}
+                      </span>
                     </div>
 
                     <div className="container mt-3 p-0">
                       <div className="row">
                         <div className="col-sm">
-                          <label className="wd-checkbox-bold">Available From</label>
+                          <label className="wd-checkbox-bold">
+                            Available From
+                          </label>
                           <div className="input-group">
                             <input
-                              type="text"
+                              type="datetime-local"
                               className="form-control"
-                              placeholder={assignment.availableFrom}
+                              name="availableFrom"
+                              defaultValue={fmtDate(formValues.availableFrom)}
                               aria-label="Available from date"
                               aria-describedby="basic-addon2"
+                              onChange={handleInputChangeDate}
                             />
-                            <span className="input-group-text" id="basic-addon2"><FaCalendarAlt /></span>
+                            <span
+                              className="input-group-text"
+                              id="basic-addon2"
+                            >
+                              {/* <FaCalendarAlt /> */}
+                            </span>
                           </div>
                         </div>
                         <div className="col-sm">
@@ -154,7 +354,12 @@ export default function AssignmentEditor() {
                               aria-label="Until date"
                               aria-describedby="basic-addon2"
                             />
-                            <span className="input-group-text" id="basic-addon2"><FaCalendarAlt /></span>
+                            <span
+                              className="input-group-text"
+                              id="basic-addon2"
+                            >
+                              {/* <FaCalendarAlt /> */}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -162,27 +367,31 @@ export default function AssignmentEditor() {
                   </div>
                 </form>
                 <div id="wd-edit-controls" className="text-nowrap">
-                  <hr className="mt-auto" style={{ marginTop: 'auto' }} />
+                  <hr className="mt-auto" style={{ marginTop: "auto" }} />
                 </div>
                 <div className="d-flex justify-content-end">
                   <Link
-                    to={`${pathname.split('/').slice(0, -1).join('/')}`} // Dynamically route back to Assignments
-                    className="text-decoration-none">
-                    <button id="wd-view-progress-btn" className="btn btn-md btn-secondary me-1">
+                    to={`${pathname.split("/").slice(0, -1).join("/")}`} // Dynamically route back to Assignments
+                    className="text-decoration-none"
+                  >
+                    <button
+                      id="wd-view-progress-btn"
+                      className="btn btn-md btn-secondary me-1"
+                    >
                       Cancel
                     </button>
-                    <button id="wd-add-module-btn" className="btn btn-md btn-danger me-2">
+                    <button
+                      onClick={handleEditAssignment}
+                      id="wd-add-module-btn"
+                      className="btn btn-md btn-danger me-2"
+                    >
                       Save
                     </button>
                   </Link>
                 </div>
               </div>
             </div>
-
           </div>
-
-        ))}
-
     </div>
   );
 }

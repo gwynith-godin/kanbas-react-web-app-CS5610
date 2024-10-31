@@ -4,21 +4,65 @@ import AssignmentControls from "./AssignmentControls";
 import { BsGripVertical } from "react-icons/bs";
 import { LuClipboardEdit } from "react-icons/lu";
 import { BsPlus } from "react-icons/bs";
-import { FaCaretDown } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import * as db from "../../Database";
-import { useParams, useLocation } from "react-router-dom";
+import { FaCaretDown, FaTrash } from "react-icons/fa";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { deleteAssignment, editAssignment } from "./reducer"
+import { useSelector, useDispatch } from "react-redux";
+import { useState } from "react";
+import ProtectedButtons from "../../Common/ProtectedRoutes";
+
+
 
 export default function Assignments() {
 
   const { cid } = useParams();
-  const assignments = db.assignments;
+  // const [assignmentName, setAssignmentName] = useState("");
+  const { assignments } = useSelector((state: any) => state.assignmentReducer || []);  // const assignments = db.assignments;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<{ _id: string; course: string; title: string; description: string; availableFrom: string; due: string; points: string } | null>(null);
+
+  
+  const handleEditAssignment = (assignment: any) => {
+    if(currentUser && currentUser.role === "FACULTY"){
+      dispatch(editAssignment(assignment._id));
+      navigate(`${pathname}/${assignment._id}`);
+    }
+  };
+
+  const handleDeleteAssignment = (assignment: { _id: string; course: string; title: string; description: string; availableFrom: string; due: string; points: string }) => {
+    setAssignmentToDelete(assignment);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteAssignment = () => {
+    if (assignmentToDelete) {
+      dispatch(deleteAssignment(assignmentToDelete._id));
+      setShowDeleteDialog(false);
+      setAssignmentToDelete(null);
+    }
+  };
+
+
+  const handleNewAssignment = () => {
+    navigate(`${pathname}/new`);
+  };
+
+  const fmtDate = (inputDate: string) => {
+    if (!inputDate) return '';
+    const d = new Date(inputDate);
+    return d.toLocaleString() 
+  }
+
   return (
 
   <div>
   <ul id="wd-modules" className="list-group rounded-1">
-    <AssignmentControls /><br /><br /><br />
+    <AssignmentControls handleNewAssignment={handleNewAssignment}/>
+    <br /><br /><br />
     <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
       <div className=" p-3 ps-2 bg-secondary d-flex justify-content-between align-items-center">
         <div className="wd-title">
@@ -50,12 +94,13 @@ export default function Assignments() {
         {assignments
           .filter((assignment: any) => assignment.course === cid)
           .map((assignment: any) => (
-            <Link
-                  to={`${pathname}/${assignment._id}`} // Dynamically route to current path with assignment ID
+            <li className="wd-lesson list-group-item p-3 ps-1 d-flex justify-content-between align-items-center"
+                  // to={`${pathname}/${assignment._id}`} // Dynamically route to current path with assignment ID
                   key={assignment._id}
-                  className="text-decoration-none"
+                  // className="text-decoration-none"
+                  onClick={() => handleEditAssignment(assignment)}
                 >
-            <li className="wd-lesson list-group-item p-3 ps-1 d-flex justify-content-between align-items-center">
+            {/* <li className="wd-lesson list-group-item p-3 ps-1 d-flex justify-content-between align-items-center"> */}
               <div className="d-flex align-items-center">
                 <BsGripVertical className="me-2 fs-3" />
                 <LuClipboardEdit className="fs-3 green-icon" />
@@ -65,23 +110,66 @@ export default function Assignments() {
                    <span className="wd-assignment-color-red"> Multiple Modules </span>
                    <span className="wd-assignment-regular">|</span>
                    <span className="wd-assignment-bold"> Not Available Until </span>
-                   <span className="wd-assignment-regular">{assignment.availableFrom}</span><br />
+                   <span className="wd-assignment-regular">{fmtDate(assignment.availableFrom)}</span><br />
                    <span className="wd-assignment-bold"> Due </span>
-                  <span className="wd-assignment-regular"> {assignment.due} |</span>
+                  <span className="wd-assignment-regular"> {fmtDate(assignment.due)} |</span>
                    <span className="wd-assignment-regular"> {assignment.points} pts</span>
                  </ul>
                </div>
               </div>
               <div className="d-flex align-items-center">
                 <LessonControlButtons />
+                <ProtectedButtons >
+                <FaTrash
+                  className="ms-3 text-danger"
+                  style={{ cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteAssignment(assignment);
+                  }}
+                />
+                </ProtectedButtons>
               </div>
             </li>
-            </Link>
           ))}
-
       </ul>
     </li>
   </ul>
+  {showDeleteDialog && (
+        <div className="modal" style={{ display: "block" }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Delete Assignment</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowDeleteDialog(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to delete this assignment?</p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowDeleteDialog(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={confirmDeleteAssignment}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 </div>
 
 );

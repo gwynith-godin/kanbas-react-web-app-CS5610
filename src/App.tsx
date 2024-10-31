@@ -2,10 +2,14 @@ import './App.css';
 import Kanbas from "./Kanbas";
 import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
 import Labs from "./Labs" //index.tsx is implied
+import store from "./Kanbas/store";
+import { Provider } from "react-redux";
 
 function App() {
   return (
     <HashRouter>
+    <Provider store={store}>
+
       <div>
       <Routes>
           <Route path="/" element={<Navigate to="Kanbas"/>}/>
@@ -13,6 +17,7 @@ function App() {
           <Route path="/Kanbas/*" element={<Kanbas />} />
         </Routes>
       </div>
+      </Provider>
     </HashRouter>
     
   );

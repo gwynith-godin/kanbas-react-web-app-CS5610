@@ -19,7 +19,7 @@ import FindIndex from "./FindIndex"
 import FilterFunction from "./FilterFunction"
 import JsonStringify from "./JsonStringify"
 import House from "./House"
-import TodoItem from "./todos/TodoItem"
+// import TodoItem from "./todos/TodoItem"
 import TodoList from "./todos/TodoList"
 import Spreading from "./Spreading"
 import Destructing from "./Destructing"
@@ -31,14 +31,22 @@ import Add from "./Add"
 import Square from "./Square"
 import Highlight from "./Highlight"
 import PathParameters from "./PathParameters"
-import AddPathParameters from "./AddPathParameters"
+import { useSelector } from "react-redux";
 
 export default function Lab3() {
-    console.log('Hello World!');
-    return(
-        <div id = "wd-lab3" className = "m-2">
+    const { todos } = useSelector((state: any) => state.todosReducer);
+    return (
+        <div id="wd-lab3" className="m-2">
             <h3>Javascript</h3>
-            <VariablesAndConstants/>
+            <ul className="list-group">
+                {todos.map((todo: any) => (
+                    <li className="list-group-item" key={todo.id}>
+                        {todo.title}
+                    </li>
+                ))}
+            </ul>
+            <hr />
+            <VariablesAndConstants />
             <VariableTypes />
             <BooleanVariable />
             <IfElse />
@@ -60,7 +68,6 @@ export default function Lab3() {
             <FilterFunction />
             <JsonStringify />
             <House />
-            <TodoItem />
             <TodoList />
             <Spreading />
             <Destructing />
@@ -79,6 +86,6 @@ export default function Lab3() {
             <hr />
             <PathParameters />
             <hr />
-            </div>
+        </div>
     );
 }
