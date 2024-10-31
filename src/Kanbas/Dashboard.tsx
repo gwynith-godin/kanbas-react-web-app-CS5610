@@ -27,7 +27,7 @@ export default function Dashboard({
   const dispatch = useDispatch();
 
   const [enrollmentFilterState, setEnrollmentFilterState] =
-    useState("enrolled");
+    useState(currentUser.role == "FACULTY"? "all": "enrolled");
 
   const handleEnrollmentClick = () => {
     setEnrollmentFilterState(

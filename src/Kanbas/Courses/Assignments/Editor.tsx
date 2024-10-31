@@ -84,8 +84,8 @@ export default function AssignmentEditor() {
     if (assignment) {
       
       if (aid === "new") {
-        console.log(formValues)
-        console.log(assignment)
+        // console.log(formValues)
+        // console.log(assignment)
         dispatch(addAssignment({ ...formValues, id: new Date().getTime().toString(), course: cid }));
       }
       else {
