@@ -9,7 +9,7 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { deleteAssignment, editAssignment } from "./reducer"
 import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
-import ProtectedButtons from "../../Common/ProtectedRoutes";
+import FacultyRestricted from "../../Common/ProtectedRoutes";
 
 
 
@@ -119,7 +119,7 @@ export default function Assignments() {
               </div>
               <div className="d-flex align-items-center">
                 <LessonControlButtons />
-                <ProtectedButtons >
+                <FacultyRestricted >
                 <FaTrash
                   className="ms-3 text-danger"
                   style={{ cursor: "pointer" }}
@@ -128,7 +128,7 @@ export default function Assignments() {
                     handleDeleteAssignment(assignment);
                   }}
                 />
-                </ProtectedButtons>
+                </FacultyRestricted>
               </div>
             </li>
           ))}

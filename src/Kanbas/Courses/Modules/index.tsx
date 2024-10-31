@@ -7,7 +7,7 @@ import { useState } from "react";
 import { addModule, editModule, updateModule, deleteModule }
   from "./reducer";
 import { useSelector, useDispatch } from "react-redux";
-import ProtectedButtons from "../../Common/ProtectedRoutes";
+import FacultyRestricted from "../../Common/ProtectedRoutes";
 
 export default function Modules() {
   const { cid } = useParams();
@@ -20,7 +20,7 @@ export default function Modules() {
     <div>
       <ul id="wd-modules" className="list-group rounded-0">
         <div className="mb-1">
-          <ProtectedButtons>
+          <FacultyRestricted>
           <ModulesControls 
           setModuleName={setModuleName} 
           moduleName={moduleName} 
@@ -28,7 +28,7 @@ export default function Modules() {
             dispatch(addModule({ name: moduleName, course: cid }));
             setModuleName("");
           }} />
-          </ProtectedButtons>
+          </FacultyRestricted>
         </div>
         {modules
           .filter((module: any) => module.course === cid)
