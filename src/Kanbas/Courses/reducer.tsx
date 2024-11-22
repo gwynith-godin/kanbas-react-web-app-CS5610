@@ -17,7 +17,7 @@ const enrollmentsSlice = createSlice({
       state.enrollments = [...state.enrollments, newEnrollment] as any;
     },
     deleteEnrollment: (state, { payload: enrollmentId }) => {
-      state.enrollments = state.enrollments.filter((a) => a._id !== enrollmentId);
+      state.enrollments = state.enrollments.filter((a: any) => a._id !== enrollmentId);
     },
     updateEnrollment: (state, { payload: enrollment }) => {
       state.enrollments = state.enrollments.map((a) =>

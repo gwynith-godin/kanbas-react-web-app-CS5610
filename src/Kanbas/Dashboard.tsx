@@ -2,15 +2,18 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import FacultyRestricted from "./Common/ProtectedRoutes";
 import { StudentRestricted } from "./Common/ProtectedRoutes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { addEnrollment, deleteEnrollment } from "./Courses/reducer";
-import { stat } from "fs";
 import { useDispatch } from "react-redux";
+import * as coursesClient from "./Courses/client";
+import { current } from "@reduxjs/toolkit";
+
 
 export default function Dashboard({
   courses,
   course,
   setCourse,
+  setCourses,
   addNewCourse,
   deleteCourse,
   updateCourse,
@@ -18,38 +21,64 @@ export default function Dashboard({
   courses: any[];
   course: any;
   setCourse: (course: any) => void;
+  setCourses: (courses: any[]) => void;
   addNewCourse: () => void;
   deleteCourse: (course: any) => void;
   updateCourse: () => void;
 }) {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const { enrollments } = useSelector((state: any) => state.enrollmentsReducer);
+  const [enrollmentToDelete, setEnrollmentToDelete] = useState<{ _id: string; user: string; course: string; } | null>(null);
+  const [coursesLoaded, setCoursesLoaded] = useState(false);
   const dispatch = useDispatch();
+  const [unenrolledCourses, setUnenrolledCourses] = useState<any[]>([]);
 
   const [enrollmentFilterState, setEnrollmentFilterState] =
-    useState(currentUser.role == "FACULTY"? "all": "enrolled");
+    useState(currentUser.role === "FACULTY"? "all": "enrolled");
 
-  const handleEnrollmentClick = () => {
-    setEnrollmentFilterState(
-      enrollmentFilterState === "enrolled" ? "all" : "enrolled"
-    );
+
+  const handleEnrollmentClick = async () => {
+    const allCourses = await coursesClient.fetchAllCourses();
+    const coursesWithEnrollmentStatus = allCourses.map((course: any) => ({
+      ...course,
+      isEnrolled: isEnrolled(course._id),
+    }));
+    if (!coursesLoaded){
+      setCourses(allCourses);
+      setCoursesLoaded(true);
+      setUnenrolledCourses(coursesWithEnrollmentStatus);
+      setEnrollmentFilterState("all");
+    }
+    else{
+      setCourse(coursesWithEnrollmentStatus);
+      setEnrollmentFilterState("enrolled");
+      setCoursesLoaded(false);
+    }
   };
 
-  const handleEnrollClick = (course: any) => {
+  const handleEnrollClick = async (course: any) => {
+    // alert("newEnrollment");
+    // const newEnrollment = await coursesClient.enrollUserInCourse(currentUser._id, course._id);
+    // alert(newEnrollment);
     dispatch(
-      addEnrollment({
-        id: new Date().getTime().toString(),
-        user: currentUser._id,
-        course: course._id,
-      })
-    );
-  };
+      addEnrollment({ _id: Date.now(),
+      user: currentUser._id,
+      course: course._id}))};
+        // newEnrollment}))};
 
-  const handleUnEnrollClick = (course: any) => {
+  const handleUnEnrollClick = async (course: any) => {
+
+    // alert("eId._id");
+
     const eId = enrollments.find(
-      (enrollment: any) => (enrollment.course === course._id) && (enrollment.user == currentUser._id)
+      (enrollment: any) => (enrollment.course === course._id) && (enrollment.user === currentUser._id)
     );
+    
+    // await coursesClient.unEnrollFromCourse(eId._id);
     dispatch(deleteEnrollment(eId._id));
+
+    const updatedCourses = courses.filter((c: any) => c._id !== course._id);
+    setCourses(updatedCourses);
   };
 
   const isEnrolled = (course: any) => {
@@ -58,6 +87,7 @@ export default function Dashboard({
         enrollment.user === currentUser._id && enrollment.course === course._id
     );
   };
+
 
   return (
     <div id="wd-dashboard">
@@ -113,9 +143,9 @@ export default function Dashboard({
       <div id="wd-dashboard-courses" className="row">
         <div className="row row-cols-1 row-cols-md-5 g-4">
           {courses
-            .filter((course) =>
-              enrollmentFilterState === "enrolled" ? isEnrolled(course) : true
-            )
+            // .filter((course) =>
+            //   enrollmentFilterState === "enrolled" ? isEnrolled(course) : true
+            // )
             .map((course) => (
               <div
                 className="wd-dashboard-course col"
@@ -157,7 +187,7 @@ export default function Dashboard({
                           Delete
                         </button>
                         <button
-                          id={`wd-edit-course-click-${course.cid}`}
+                          id={`wd-edit-course-click-${course._id}`}
                           onClick={(event) => {
                             event.preventDefault();
                             setCourse(course);
@@ -182,6 +212,7 @@ export default function Dashboard({
                         <button
                           className="btn btn-danger float-end me-2"
                           onClick={(e) => {
+                            // alert(enrollments._id);
                             e.preventDefault();
                             handleUnEnrollClick(course);
                           }}
@@ -201,3 +232,5 @@ export default function Dashboard({
     </div>
   );
 }
+
+

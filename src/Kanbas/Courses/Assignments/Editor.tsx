@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { addAssignment, updateAssignment } from "./reducer";
+import * as assignmentsClient from "./client";
+import * as coursesClient from "../client";
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams();
@@ -10,12 +12,11 @@ export default function AssignmentEditor() {
   );
   const { pathname } = useLocation();
   const dispatch = useDispatch();
-  
+  const [assignmentName] = useState("");
+
   const setAssignment = () => {
     if (aid === "new"){
-      // new Date().getTime().toString()
       return { id: new Date().getTime().toString(), course: cid };
-  
     }
     else {
       return assignments.find(
@@ -36,11 +37,9 @@ export default function AssignmentEditor() {
     due: '',
     points: '',
   });
-  // console.log(assignment)
   console.log(formValues)
 
   const fmtDate = (inputDate: string) => {
-    // console.log(inputDate)
     if (!inputDate) return '';
     const d = new Date(inputDate);
     return (new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString()).slice(0, -1)
@@ -62,8 +61,6 @@ export default function AssignmentEditor() {
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target as HTMLInputElement;
-    console.log(name);
-    console.log(value);
     setFormValues({
       ...formValues,
       [name]: value,
@@ -80,15 +77,19 @@ export default function AssignmentEditor() {
   };
 
   // Handle assignment edit
-  const handleEditAssignment = () => {
+  const handleEditAssignment = async () => {
     if (assignment) {
       
       if (aid === "new") {
-        // console.log(formValues)
-        // console.log(assignment)
-        dispatch(addAssignment({ ...formValues, id: new Date().getTime().toString(), course: cid }));
+
+
+        // const newAssignment = { name: assignmentName, course: cid };
+        const assignment = await coursesClient.createAssignmentForCourse(cid, { ...formValues, id: new Date().getTime().toString(), course: cid });
+        dispatch(addAssignment(assignment));
+        // dispatch(addAssignment({ ...formValues, id: new Date().getTime().toString(), course: cid }));
       }
       else {
+        await assignmentsClient.updateAssignment({ ...assignment, ...formValues });
         dispatch(updateAssignment({ ...assignment, ...formValues }));
       }
     }
@@ -126,10 +127,11 @@ export default function AssignmentEditor() {
                 <div className="col-sm-12 d-flex justify-content-end">
                   <label className="me-3">Points</label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control p-6 mb-3"
                     id="assignment-points"
-                    defaultValue={assignment.points}
+                    defaultValue={formValues.points}
+                    onChange={handleInputChange}
                     style={{ width: "350px" }}
                   />
                 </div>

@@ -27,8 +27,6 @@ export default function AssignmentControls({
         </FacultyRestricted>
       </div>
       <div>
-        {/* <AssignmentEditor 
-      /> */}
       </div>
       <div>
         <button

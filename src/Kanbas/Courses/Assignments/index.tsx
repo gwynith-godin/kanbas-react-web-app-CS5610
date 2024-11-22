@@ -6,18 +6,19 @@ import { LuClipboardEdit } from "react-icons/lu";
 import { BsPlus } from "react-icons/bs";
 import { FaCaretDown, FaTrash } from "react-icons/fa";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { deleteAssignment, editAssignment } from "./reducer"
+import { setAssignments, addAssignment, deleteAssignment, editAssignment, updateAssignment } from "./reducer"
 import { useSelector, useDispatch } from "react-redux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FacultyRestricted from "../../Common/ProtectedRoutes";
+import * as assignmentsClient from "./client";
+import * as coursesClient from "../client";
 
-
-
-export default function Assignments() {
+export default function Assignments (){
 
   const { cid } = useParams();
   // const [assignmentName, setAssignmentName] = useState("");
   const { assignments } = useSelector((state: any) => state.assignmentReducer || []);  // const assignments = db.assignments;
+  const [assignmentName, setAssignmentName] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -26,6 +27,29 @@ export default function Assignments() {
   const [assignmentToDelete, setAssignmentToDelete] = useState<{ _id: string; course: string; title: string; description: string; availableFrom: string; due: string; points: string } | null>(null);
 
   
+  // const saveAssignment = async (assignment: any) => {
+  //   await assignmentsClient.updateAssignment(assignment);
+  //   dispatch(updateAssignment(assignment));
+  // };
+
+  // const removeAssignment = async (assignmentId: string) => {
+  //   await assignmentsClient.deleteAssignment(assignmentId);
+  //   dispatch(deleteAssignment(assignmentId));
+  // };
+
+  const createAssignmentForCourse = async () => {
+    // navigate(`${pathname}/new`);
+    if (!cid) return;
+    const newAssignment = { name: assignmentName, course: cid };
+    const assignment = await coursesClient.createAssignmentForCourse(cid, newAssignment);
+    dispatch(addAssignment(assignment));
+  };
+
+  const fetchAssignments = async () => {
+    const assignments = await coursesClient.findAssignmentsForCourse(cid as string);
+    dispatch(setAssignments(assignments));
+  };
+
   const handleEditAssignment = (assignment: any) => {
     if(currentUser && currentUser.role === "FACULTY"){
       dispatch(editAssignment(assignment._id));
@@ -33,19 +57,21 @@ export default function Assignments() {
     }
   };
 
-  const handleDeleteAssignment = (assignment: { _id: string; course: string; title: string; description: string; availableFrom: string; due: string; points: string }) => {
+  const handleDeleteAssignment = async (assignment: { _id: string; course: string; title: string; description: string; availableFrom: string; due: string; points: string }) => {
     setAssignmentToDelete(assignment);
     setShowDeleteDialog(true);
   };
 
-  const confirmDeleteAssignment = () => {
+  const confirmDeleteAssignment = async () => {
     if (assignmentToDelete) {
+
+      // now using client
+      await assignmentsClient.deleteAssignment(assignmentToDelete._id);
       dispatch(deleteAssignment(assignmentToDelete._id));
       setShowDeleteDialog(false);
       setAssignmentToDelete(null);
     }
   };
-
 
   const handleNewAssignment = () => {
     navigate(`${pathname}/new`);
@@ -55,13 +81,21 @@ export default function Assignments() {
     if (!inputDate) return '';
     const d = new Date(inputDate);
     return d.toLocaleString() 
-  }
+  };
+
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
+
 
   return (
 
   <div>
   <ul id="wd-modules" className="list-group rounded-1">
-    <AssignmentControls handleNewAssignment={handleNewAssignment}/>
+    <AssignmentControls 
+    handleNewAssignment={handleNewAssignment}
+    // handleNewAssignment={createAssignmentForCourse}
+    />
     <br /><br /><br />
     <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
       <div className=" p-3 ps-2 bg-secondary d-flex justify-content-between align-items-center">
@@ -92,15 +126,13 @@ export default function Assignments() {
         </div>
       <ul className="wd-lessons list-group rounded-0">
         {assignments
-          .filter((assignment: any) => assignment.course === cid)
+          // .filter((assignment: any) => assignment.course === cid)
           .map((assignment: any) => (
             <li className="wd-lesson list-group-item p-3 ps-1 d-flex justify-content-between align-items-center"
-                  // to={`${pathname}/${assignment._id}`} // Dynamically route to current path with assignment ID
                   key={assignment._id}
-                  // className="text-decoration-none"
                   onClick={() => handleEditAssignment(assignment)}
+                  // onClick={() => dispatch(editAssignment(assignment._id))}
                 >
-            {/* <li className="wd-lesson list-group-item p-3 ps-1 d-flex justify-content-between align-items-center"> */}
               <div className="d-flex align-items-center">
                 <BsGripVertical className="me-2 fs-3" />
                 <LuClipboardEdit className="fs-3 green-icon" />
@@ -127,6 +159,11 @@ export default function Assignments() {
                     e.stopPropagation();
                     handleDeleteAssignment(assignment);
                   }}
+                  // onClick={(e) => 
+                  //   {
+                  //     e.stopPropagation();
+                  //     removeAssignment(assignment._id)}
+                  //   }
                 />
                 </FacultyRestricted>
               </div>
@@ -173,4 +210,4 @@ export default function Assignments() {
 </div>
 
 );
-}
+};
