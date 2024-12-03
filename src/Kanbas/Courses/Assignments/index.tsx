@@ -26,24 +26,14 @@ export default function Assignments (){
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState<{ _id: string; course: string; title: string; description: string; availableFrom: string; due: string; points: string } | null>(null);
 
-  
-  // const saveAssignment = async (assignment: any) => {
-  //   await assignmentsClient.updateAssignment(assignment);
-  //   dispatch(updateAssignment(assignment));
-  // };
 
-  // const removeAssignment = async (assignmentId: string) => {
-  //   await assignmentsClient.deleteAssignment(assignmentId);
-  //   dispatch(deleteAssignment(assignmentId));
+  // const createAssignmentForCourse = async () => {
+  //   // navigate(`${pathname}/new`);
+  //   if (!cid) return;
+  //   const newAssignment = { name: assignmentName, course: cid };
+  //   const assignment = await coursesClient.createAssignmentForCourse(cid, newAssignment);
+  //   dispatch(addAssignment(assignment));
   // };
-
-  const createAssignmentForCourse = async () => {
-    // navigate(`${pathname}/new`);
-    if (!cid) return;
-    const newAssignment = { name: assignmentName, course: cid };
-    const assignment = await coursesClient.createAssignmentForCourse(cid, newAssignment);
-    dispatch(addAssignment(assignment));
-  };
 
   const fetchAssignments = async () => {
     const assignments = await coursesClient.findAssignmentsForCourse(cid as string);
@@ -51,7 +41,7 @@ export default function Assignments (){
   };
 
   const handleEditAssignment = (assignment: any) => {
-    if(currentUser && currentUser.role === "FACULTY"){
+    if(currentUser && currentUser.role === "ADMIN"){
       dispatch(editAssignment(assignment._id));
       navigate(`${pathname}/${assignment._id}`);
     }

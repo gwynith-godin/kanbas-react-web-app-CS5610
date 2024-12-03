@@ -12,7 +12,7 @@ export default function AssignmentEditor() {
   );
   const { pathname } = useLocation();
   const dispatch = useDispatch();
-  const [assignmentName] = useState("");
+  // const [assignmentName] = useState("");
 
   const setAssignment = () => {
     if (aid === "new"){
@@ -27,7 +27,6 @@ export default function AssignmentEditor() {
   }
 
   const assignment = useMemo(setAssignment, [aid, cid, assignments]);
-
 
   // State to manage form values
   const [formValues, setFormValues] = useState({
@@ -76,12 +75,21 @@ export default function AssignmentEditor() {
     });
   };
 
+  const handleNumericInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    if (!isNaN(Number(value))) {
+      setFormValues({
+        ...formValues,
+        [name]: value,
+      });
+    }
+};
+
   // Handle assignment edit
   const handleEditAssignment = async () => {
     if (assignment) {
       
       if (aid === "new") {
-
 
         // const newAssignment = { name: assignmentName, course: cid };
         const assignment = await coursesClient.createAssignmentForCourse(cid, { ...formValues, id: new Date().getTime().toString(), course: cid });
@@ -127,11 +135,11 @@ export default function AssignmentEditor() {
                 <div className="col-sm-12 d-flex justify-content-end">
                   <label className="me-3">Points</label>
                   <input
-                    type="number"
+                    type="text"
                     className="form-control p-6 mb-3"
                     id="assignment-points"
                     defaultValue={formValues.points}
-                    onChange={handleInputChange}
+                    onChange={handleNumericInputChange}
                     style={{ width: "350px" }}
                   />
                 </div>
@@ -342,7 +350,6 @@ export default function AssignmentEditor() {
                               className="input-group-text"
                               id="basic-addon2"
                             >
-                              {/* <FaCalendarAlt /> */}
                             </span>
                           </div>
                         </div>
@@ -360,7 +367,6 @@ export default function AssignmentEditor() {
                               className="input-group-text"
                               id="basic-addon2"
                             >
-                              {/* <FaCalendarAlt /> */}
                             </span>
                           </div>
                         </div>

@@ -1,6 +1,6 @@
 import { FaPlus } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
-import FacultyRestricted from "../../Common/ProtectedRoutes";
+import AdminRestricted from "../../Common/ProtectedRoutes";
 
 interface AssignmentControlsProps {
   handleNewAssignment: () => void;
@@ -12,7 +12,7 @@ export default function AssignmentControls({
   return (
     <div id="wd-assignment-controls" className="text-nowrap">
       <div>
-        <FacultyRestricted>
+        <AdminRestricted>
         <button
           id="wd-add-assignment-btn"
           className="btn btn-lg btn-danger me-1 float-end"
@@ -24,7 +24,7 @@ export default function AssignmentControls({
           />
           Assignment
         </button>
-        </FacultyRestricted>
+        </AdminRestricted>
       </div>
       <div>
       </div>

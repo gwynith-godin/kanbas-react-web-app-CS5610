@@ -1,6 +1,15 @@
 import { useSelector } from "react-redux";
 
-export default function FacultyRestricted({ children}: { children: any}) {
+
+export default function AdminRestricted({ children}: { children: any}) {
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  if (currentUser && currentUser.role === "ADMIN") {
+    return children;
+  } else {
+    return <></>
+}}
+
+export function FacultyRestricted({ children}: { children: any}) {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   if (currentUser && currentUser.role === "FACULTY") {
     return children;

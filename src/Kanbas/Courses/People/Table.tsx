@@ -4,10 +4,6 @@ import { Link } from "react-router-dom";
 
 
 export default function PeopleTable({ users = [] }: { users?: any[] }) {
-  // const { cid } = useParams();
-  // const users = db.users;
-  // const enrollments = db.enrollments
-  // const { users, enrollments } = db;
 
   return (
     <div id="wd-people-table">
@@ -36,7 +32,6 @@ export default function PeopleTable({ users = [] }: { users?: any[] }) {
                 <td className="wd-last-activity">{user.lastActivity}</td>
                 <td className="wd-total-activity">{user.totalActivity}</td> </tr>
             ))}
-          {/* Add at least 3 more users such as Bruce Wayne, Steve Rogers, and Natasha Romanoff */}
         </tbody>
       </table>
     </div>);

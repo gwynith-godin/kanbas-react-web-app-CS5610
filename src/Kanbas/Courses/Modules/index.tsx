@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { addModule, editModule, updateModule, deleteModule, setModules }
   from "./reducer";
 import { useSelector, useDispatch } from "react-redux";
-import FacultyRestricted from "../../Common/ProtectedRoutes";
+import AdminRestricted from "../../Common/ProtectedRoutes";
 import * as coursesClient from "../client";
 import * as modulesClient from "./client";
 
@@ -23,6 +23,7 @@ export default function Modules() {
   };
 
   const removeModule = async (moduleId: string) => {
+    console.log("mod id: ", moduleId);
     await modulesClient.deleteModule(moduleId);
     dispatch(deleteModule(moduleId));
   };
@@ -33,29 +34,19 @@ export default function Modules() {
     const module = await coursesClient.createModuleForCourse(cid, newModule);
     dispatch(addModule(module));
   };
-
-  const fetchModules = async () => {
-    const modules = await coursesClient.findModulesForCourse(cid as string);
-    dispatch(setModules(modules));
-  };
-  useEffect(() => {
-    fetchModules();
-  }, []);
-
-  
   
   return (
     <div>
       <ul id="wd-modules" className="list-group rounded-0">
         <div className="mb-1">
-          <FacultyRestricted>
+          <AdminRestricted>
           <ModulesControls 
           setModuleName={setModuleName} 
           moduleName={moduleName} 
           addModule={
             createModuleForCourse
           } />
-          </FacultyRestricted>
+          </AdminRestricted>
         </div>
         {modules
           // .filter((module: any) => module.course === cid)

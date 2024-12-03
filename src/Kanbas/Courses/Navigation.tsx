@@ -5,7 +5,7 @@ import { useParams, useLocation } from "react-router";
 export default function CoursesNavigation() {
   const links = ["Home", "Modules", "Piazza", "Zoom", "Assignments", "Quizzes", "Grades", "People"];
   const { cid } = useParams();
-  const course = courses.find((course) => course._id === cid);
+  // const course = courses.find((course) => course._id === cid);
   const { pathname } = useLocation();
 
   return (
@@ -16,7 +16,7 @@ export default function CoursesNavigation() {
         return (
           <Link 
             key={index}
-            to={`/Kanbas/Courses/${course?._id}/${link}`}
+            to={`/Kanbas/Courses/${cid}/${link}`}
             id={`wd-course-${link.toLowerCase()}-link`}
             className={`list-group-item border border-0 ${isActive ? "active" : "text-danger"}`}
           >
