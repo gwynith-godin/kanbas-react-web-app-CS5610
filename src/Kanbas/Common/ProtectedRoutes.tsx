@@ -24,3 +24,11 @@ export function StudentRestricted({ children}: { children: any}) {
   } else {
     return <></>
 }}
+
+export function FacultyAndAdminRestricted({ children}: { children: any}) {
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  if (currentUser && currentUser.role === "ADMIN" || currentUser.role === "FACULTY") {
+    return children;
+  } else {
+    return <></>
+}}
