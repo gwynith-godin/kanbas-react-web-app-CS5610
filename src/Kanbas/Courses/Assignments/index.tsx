@@ -1,5 +1,5 @@
 import { IoEllipsisVertical } from "react-icons/io5";
-import LessonControlButtons from "../Modules/LessonControlButtons";
+import {LessonControlButtons} from "../Modules/LessonControlButtons";
 import AssignmentControls from "./AssignmentControls";
 import { BsGripVertical } from "react-icons/bs";
 import { LuClipboardEdit } from "react-icons/lu";
