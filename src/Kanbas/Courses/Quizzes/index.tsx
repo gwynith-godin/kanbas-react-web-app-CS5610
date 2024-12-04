@@ -96,7 +96,7 @@ export default function Quizzes() {
                    <span className="wd-assignment-bold"> Due </span>
                    <span className="wd-assignment-regular">{fmtDate(quiz.dueDate)}</span><span>  </span>
                    <span className="wd-assignment-regular"><PiLineVertical /></span>
-                  <span className="wd-assignment-regular"> {quiz.points} pts<PiLineVertical /></span>
+                   <span className="wd-assignment-regular"> {quiz.points} pts<PiLineVertical /></span>
                    <span className="wd-assignment-regular"> {quiz.numQuestions} Questions</span>
                  </ul>
                </div>
