@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router";
 
 export default function DetailsPageButtons(){
-    const { qid } = useParams()
+    const { qid } = useParams();
     const [quiz, setQuiz] = useState<any>({});
     
     const fetchQuiz = async () => {

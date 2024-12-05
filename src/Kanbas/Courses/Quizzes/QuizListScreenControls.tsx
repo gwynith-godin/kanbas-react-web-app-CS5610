@@ -1,9 +1,11 @@
 import { FaPlus } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { BsGripVertical } from "react-icons/bs";
-
 import AdminRestricted from "../../Common/ProtectedRoutes";
 import { IoEllipsisVertical } from "react-icons/io5";
+import { useParams } from "react-router";
+import * as coursesClient from "../client";
+import { addQuiz } from "./reducer";
 
 interface QuizControlsProps {
   handleNewQuiz: () => void;
@@ -12,6 +14,18 @@ interface QuizControlsProps {
 export default function QuizListScreenControls({
     handleNewQuiz,
 }: QuizControlsProps) {
+  const { cid } = useParams();
+
+  const createNewQuiz = async () => {
+    if (!cid) return;
+    const quizName = "New Quiz";
+    const newQuiz = { title: quizName, course: cid };
+    const quiz = await coursesClient.createQuizForCourse(cid, newQuiz);
+    dispatch(addQuiz(quiz));
+    console.log("quiz: ", quiz._id);
+    return quiz._id;
+  };
+
   return (
     <div id="wd-quiz-controls" className="text-nowrap mb-1">
       <div>
@@ -19,7 +33,7 @@ export default function QuizListScreenControls({
         <button
           id="wd-btn"
           className="btn btn-lg bg-secondary me-1 float-end"
-          onClick={handleNewQuiz}
+          // onClick={handleNewQuiz}
         >
           <IoEllipsisVertical className="fs-4"
             style={{ bottom: "1px" }}
@@ -28,7 +42,7 @@ export default function QuizListScreenControls({
         <button
           id="wd-add-quiz-btn"
           className="btn btn-lg btn-danger me-1 float-end"
-          onClick={handleNewQuiz}
+          // onClick={handleNewQuiz}
         >
           <FaPlus
             className="position-relative me-2"
@@ -55,3 +69,7 @@ export default function QuizListScreenControls({
     </div>
   );
 }
+function dispatch(arg0: any) {
+  throw new Error("Function not implemented.");
+}
+

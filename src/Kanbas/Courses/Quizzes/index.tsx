@@ -27,6 +27,7 @@ export default function Quizzes() {
   const { pathname } = useLocation();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const [isPublished, setIsPublished] = useState(true);
+  const [quizName, setQuizName] = useState("");
 
   const fetchQuizzes = async () => {
     const quizzes = await coursesClient.findQuizzesForCourse(cid as string);
@@ -40,25 +41,47 @@ export default function Quizzes() {
   };
 
   const handleAvailability = (availableDate: Date, untilDate: Date) => {
-    const currentDate = new Date().toISOString();
-    const availableDateFrmt = new Date(availableDate).toISOString();
-    const untilDateFrmt = new Date(untilDate).toISOString();
-
-    if (currentDate > untilDateFrmt) {
-        return 'Closed';
-    } else if (currentDate >= availableDateFrmt && currentDate <= untilDateFrmt) {
-        return 'Available';
-    } else if (currentDate < availableDateFrmt) {
-        return `Not available until ${availableDate.toLocaleString()}`;
+    if (!availableDate || !untilDate) {
+      return 'Invalid date';
     }
-  }
+  
+    const availableDateObj = new Date(availableDate);
+    const untilDateObj = new Date(untilDate);
+  
+    if (isNaN(availableDateObj.getTime()) || isNaN(untilDateObj.getTime())) {
+      return 'Invalid date';
+    }
+  
+    const currentDate = new Date().toISOString();
+    const availableDateFrmt = availableDateObj.toISOString();
+    const untilDateFrmt = untilDateObj.toISOString();
+  
+    if (currentDate > untilDateFrmt) {
+      return 'Closed';
+    } else if (currentDate >= availableDateFrmt && currentDate <= untilDateFrmt) {
+      return 'Available';
+    } else if (currentDate < availableDateFrmt) {
+      return `Not available until ${availableDateObj.toLocaleString()}`;
+    }
+  };
 
   const handleDetailsPage = (quiz: any) => {
     navigate(`${pathname}/${quiz._id}`);
   }
 
+  const createNewQuiz = async () => {
+    if (!cid) return;
+    const quizName = "New Quiz";
+    const newQuiz = { title: quizName, course: cid };
+    const quiz = await coursesClient.createQuizForCourse(cid, newQuiz);
+    dispatch(addQuiz(quiz));
+    console.log("quiz: ", quiz._id);
+    return quiz._id;
+  };
+
   const handleNewQuiz = () => {
-    navigate(`${pathname}/new`);
+    const quizId = createNewQuiz();
+    navigate(`${pathname}/${quizId}`);
   };
 
   useEffect(() => {
@@ -69,7 +92,8 @@ export default function Quizzes() {
     <div>
       <ul id="wd-modules" className="list-group rounded-1">
         <FacultyAndAdminRestricted>
-      <QuizListScreenControls handleNewQuiz={handleNewQuiz}/>
+      <QuizListScreenControls 
+      handleNewQuiz={handleNewQuiz}/>
         </FacultyAndAdminRestricted>
         <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
           <div className=" p-3 ps-2 bg-secondary d-flex justify-content-between align-items-center">
