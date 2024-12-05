@@ -52,6 +52,15 @@ export const createAssignmentForCourse = async (courseId: string | undefined, as
   return response.data;
 };
 
+export const createQuizForCourse = async (courseId: string | undefined, quiz: any) => {
+  const response = await axiosWithCredentials.post(
+    `${COURSES_API}/${courseId}/quizzes`,
+    quiz
+  );
+  return response.data;
+};
+
+
 export const fetchAllEnrollments = async () => {
   const { data } = await axiosWithCredentials.get(ENROLLMENTS_API);
   return data;
