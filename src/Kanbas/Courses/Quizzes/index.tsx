@@ -88,6 +88,7 @@ export default function Quizzes() {
     fetchQuizzes();
   }, []);
 
+
   return (
     <div>
       <ul id="wd-modules" className="list-group rounded-1">

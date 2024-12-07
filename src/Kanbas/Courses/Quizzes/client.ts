@@ -32,3 +32,13 @@ export const deleteQuestion = async (quizId: any, questionId: any) => {
   const response = await axios.delete(`${QUIZZES_API}/${quizId}/question/${questionId}`);
   return response.data;
 }
+
+export const getQuestion = async (quizId: any, questionId: any) => {
+  const response = await axios.get(`${QUIZZES_API}/${quizId}/question/${questionId}`);
+  return response.data;
+}
+
+export const updateQuestion = async (quizId: any, questionId: any, question: any) => {
+  const response = await axios.put(`${QUIZZES_API}/${quizId}/question/${questionId}`, question);
+  return response.data;
+}
