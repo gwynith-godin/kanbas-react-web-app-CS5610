@@ -1,6 +1,8 @@
 import axios from "axios";
 const REMOTE_SERVER = process.env.REACT_APP_REMOTE_SERVER;
 const QUIZZES_API = `${REMOTE_SERVER}/api/quizzes`;
+const ATTEMPTS_API = `${QUIZZES_API}/attempt`;
+
 const axiosWithCredentials = axios.create({ withCredentials: true });
 
 export const updateQuiz = async (quiz: any) => {
@@ -32,3 +34,37 @@ export const deleteQuestion = async (quizId: any, questionId: any) => {
   const response = await axios.delete(`${QUIZZES_API}/${quizId}/question/${questionId}`);
   return response.data;
 }
+
+
+
+// Create a new attempt
+export const createAttempt = async (attemptData: any) => {
+  console.log("creating attempt", attemptData);
+  const response = await axios.post(ATTEMPTS_API, attemptData);
+  return response.data;
+};
+
+// Find all attempts
+export const findAllAttempts = async () => {
+  const response = await axios.get(ATTEMPTS_API);
+  return response.data;
+};
+
+// Find attempt by ID
+export const findAttemptById = async (attemptId: string) => {
+  const response = await axios.get(`${ATTEMPTS_API}/${attemptId}`);
+  return response.data;
+};
+
+// Update an attempt by ID
+export const updateAttempt = async (attemptId: string, updatedData: any) => {
+  console.log("attempt", attemptId)
+  const response = await axios.put(`${ATTEMPTS_API}/${attemptId}`, updatedData);
+  return response.data;
+};
+
+// Delete an attempt by ID
+export const deleteAttempt = async (attemptId: string) => {
+  const response = await axios.delete(`${ATTEMPTS_API}/${attemptId}`);
+  return response.data;
+};

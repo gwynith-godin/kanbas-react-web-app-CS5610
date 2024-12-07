@@ -30,7 +30,7 @@ export default function DetailsPageButtons(){
         <button
           id="wd-preview-btn"
           className="btn btn-lg btn-secondary me-1"
-        //   onClick={handleNewAssignment}
+          onClick={() => navigate(`${pathname}/preview`)}
         >
           Preview
         </button>

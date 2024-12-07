@@ -20,6 +20,7 @@ export default function QuestionsList() {
             title: 'Default Title',
             points: '0',
             question: 'Enter question here',
+            correctAnswer: 'option 1',
             options: [
                 { text: 'option 1', isCorrect: false },
                 { text: 'option 2', isCorrect: false }
