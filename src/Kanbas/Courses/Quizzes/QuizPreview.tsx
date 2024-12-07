@@ -89,7 +89,6 @@ export default function QuizPreview() {
       }
     } else {
       // If no selected option yet, still navigate but won't update the server.
-      // You might want to enforce that a user can't proceed without selecting.
       setCurrentQuestionIndex(newIndex);
       setSelectedOption(null);
     }
