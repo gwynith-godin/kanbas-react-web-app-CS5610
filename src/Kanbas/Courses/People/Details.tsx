@@ -62,7 +62,27 @@ export default function PeopleDetails() {
             onKeyDown={(e) => {
               if (e.key === "Enter") { saveUser(); }}}/>)}
       </div>
-      <b>Roles:</b>           <span className="wd-roles">         {user.role}         </span> <br />
+
+      <div className="text-danger fs-4 wd-roles"> 
+        
+        {!editing && (
+          <FaPencil onClick={() => setEditing(true)}
+              className="float-end fs-5 mt-2 wd-edit" /> )}
+        {editing && (
+          <FaCheck onClick={() => saveUser()}
+              className="float-end fs-5 mt-2 me-2 wd-save" /> )}
+        {!editing && (
+          <div className="wd-name"
+               onClick={() => setEditing(true)}>
+            {user.role}</div>)} 
+        {user && editing && (
+          <input className="form-control w-50 wd-edit-name"
+            defaultValue={`${user.role}`}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") { saveUser(); }}}/>)}
+      </div>
+      {/* <b>Roles:</b>           <span className="wd-roles">         {user.role}         </span> <br /> */}
       <b>Login ID:</b>        <span className="wd-login-id">      {user.loginId}      </span> <br />
       <b>Section:</b>         <span className="wd-section">       {user.section}      </span> <br />
       <b>Total Activity:</b>  <span className="wd-total-activity">{user.totalActivity}</span> 
