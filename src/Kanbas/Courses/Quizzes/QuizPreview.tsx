@@ -1,6 +1,8 @@
+// QuizPreview.tsx
 import React, { useEffect, useState } from 'react';
-import { getQuestions, createAttempt, updateAttempt } from './client'; 
-import { useParams, useNavigate } from 'react-router-dom';
+import { getQuestions, createAttempt, updateAttempt, getAttemptCount, findQuizById } from './client'; 
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 export default function QuizPreview() {
   const [questions, setQuestions] = useState<any[]>([]);
@@ -9,37 +11,58 @@ export default function QuizPreview() {
   const [isLoading, setIsLoading] = useState(true);
   const [answers, setAnswers] = useState<any[]>([]); 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  
+  // New state variables for quiz details and attempt count
+  const [maxAttempts, setMaxAttempts] = useState<number>(0);
+  const [currentAttemptCount, setCurrentAttemptCount] = useState<number>(0);
+  const [isAttemptLimitChecked, setIsAttemptLimitChecked] = useState<boolean>(false);
 
   const { qid } = useParams();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
 
   useEffect(() => {
-    if (qid) {
-      getQuestions(qid)
-        .then((data) => {
-          setQuestions(data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching questions:", error);
-          setIsLoading(false);
-        });
-    }
-  }, [qid]);
+    const fetchData = async () => {
+      if (qid) {
+        try {
+          // Fetch quiz details to get maxAttempts
+          const quiz = await findQuizById(qid);
+          setMaxAttempts(quiz.howManyAttempts);
 
-  const handleStart = () => {
+          // Fetch questions
+          const questionsData = await getQuestions(qid);
+          setQuestions(questionsData);
+
+          // Fetch current attempt count
+          const attemptCount = await getAttemptCount(currentUser._id, qid);
+          setCurrentAttemptCount(attemptCount);
+
+          setIsAttemptLimitChecked(true);
+          setIsLoading(false);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+  }, [qid, currentUser._id]);
+
+  const handleStart = async () => {
     if (!qid) return;
-    const userId = "674f32e4ab8b239e4c328be0"; 
-    createAttempt({ quizId: qid, userId })
-      .then((newAttempt) => {
-        setAttempt(newAttempt);
-        // On starting attempt, ensure no previously stored answers or selections
-        setAnswers([]);
-        setSelectedOption(null);
-      })
-      .catch((error) => {
-        console.error("Error creating attempt:", error);
-      });
+    const userId = currentUser._id; 
+
+    try {
+      const newAttempt = await createAttempt({ quizId: qid, userId });
+      setAttempt(newAttempt);
+      // On starting attempt, ensure no previously stored answers or selections
+      setAnswers([]);
+      setSelectedOption(null);
+    } catch (error) {
+      console.error("Error creating attempt:", error);
+    }
   };
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -52,9 +75,9 @@ export default function QuizPreview() {
     if (!attempt) return;
 
     const questionId = currentQuestion?._id;
+    const updatedAnswers = [...answers];
+
     if (questionId && selectedOption !== null) {
-      // Update answers array with the latest selection
-      const updatedAnswers = [...answers];
       const existingIndex = updatedAnswers.findIndex(a => a.questionId === questionId);
       const newAnswer = { questionId: questionId, selectedOption };
 
@@ -64,14 +87,12 @@ export default function QuizPreview() {
         updatedAnswers[existingIndex] = newAnswer;
       }
 
-      // Update the attempt on the server with the full answers array
       try {
         const updatedAttemptData = { ...attempt, answers: updatedAnswers };
         const updatedAttempt = await updateAttempt(attempt._id, updatedAttemptData);
         setAttempt(updatedAttempt);
         setAnswers(updatedAnswers);
 
-        // Move to the next/previous question and reset selectedOption for that question
         setCurrentQuestionIndex(newIndex);
 
         // If the next question has been answered before, pre-select its option
@@ -85,10 +106,9 @@ export default function QuizPreview() {
 
       } catch (error) {
         console.error("Error updating attempt:", error);
-        // Handle error, maybe show an error message
       }
     } else {
-      // If no selected option yet, still navigate but won't update the server.
+      // No selected option, just navigate without updating attempt answers
       setCurrentQuestionIndex(newIndex);
       setSelectedOption(null);
     }
@@ -106,68 +126,139 @@ export default function QuizPreview() {
     }
   };
 
-  if (isLoading) {
-    return <p>Loading questions...</p>;
+  const handleSubmit = async () => {
+    // Final save before submitting
+    if (!attempt) return;
+    const questionId = currentQuestion?._id;
+    const updatedAnswers = [...answers];
+
+    if (questionId && selectedOption !== null) {
+      const existingIndex = updatedAnswers.findIndex(a => a.questionId === questionId);
+      const newAnswer = { questionId: questionId, selectedOption };
+
+      if (existingIndex === -1) {
+        updatedAnswers.push(newAnswer);
+      } else {
+        updatedAnswers[existingIndex] = newAnswer;
+      }
+
+      try {
+        const updatedAttemptData = { ...attempt, answers: updatedAnswers };
+        const updatedAttempt = await updateAttempt(attempt._id, updatedAttemptData);
+        setAttempt(updatedAttempt);
+        setAnswers(updatedAnswers);
+
+        // Navigate to a review page to show selected vs correct answers
+        navigate(`${pathname}/${attempt._id}/review`);
+
+      } catch (error) {
+        console.error("Error updating attempt:", error);
+      }
+    } else {
+      // If no selection on the last question, still proceed to submit
+      navigate(`${pathname}/${attempt._id}/review`);
+    }
+  };
+
+  if (isLoading || !isAttemptLimitChecked) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="sr-only">Loading questions...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: '20px' }}>
-      <button onClick={() => navigate(-1)} style={{ marginBottom: '20px' }}>
-        Back to Quiz Details
+    <div className="container my-5">
+      <button 
+        onClick={() => navigate(-1)} 
+        className="btn btn-secondary mb-4"
+      >
+        &laquo; Back
       </button>
-      <h1>Quiz Preview</h1>
+      <h1 className="mb-4">Quiz</h1>
 
-      {/* If no attempt yet, show start button once questions are loaded */}
-      {!attempt && !isLoading && questions.length > 0 && (
-        <div>
-          <p>Ready to start the quiz?</p>
-          <button onClick={handleStart}>Start</button>
+      {/* Conditional Rendering Based on Attempt Count */}
+      {!attempt && questions.length > 0 && (
+        <div className="text-center">
+          {currentAttemptCount < maxAttempts ? (
+            <>
+              <p className="lead">Ready to start the quiz? Warning: this will start a quiz attempt!</p>
+              <button 
+                onClick={handleStart} 
+                className="btn btn-primary btn-lg"
+              >
+                Start Quiz
+              </button>
+            </>
+          ) : (
+            <div className="alert alert-info" role="alert">
+              All attempts used.
+            </div>
+          )}
         </div>
       )}
 
-      {/* Once attempt is created and we have at least one question */}
       {attempt && questions.length > 0 && currentQuestion && (
-        <div>
-          <h2>
-            Question {currentQuestionIndex + 1} of {questions.length}
-          </h2>
-          <p>{currentQuestion.question}</p>
-          <div>
-            {currentQuestion.options?.map((option: any, idx: any) => (
-              <div key={idx} style={{ margin: '5px 0' }}>
-                <label>
+        <div className="card">
+          <div className="card-body">
+            <h5 className="card-title">
+              Question {currentQuestionIndex + 1} of {questions.length}
+            </h5>
+            <p className="card-text">{currentQuestion.question}</p>
+            <form>
+              {currentQuestion.options?.map((option: any, idx: any) => (
+                <div className="form-check" key={idx}>
                   <input 
+                    className="form-check-input" 
                     type="radio" 
                     name={`question-${currentQuestionIndex}`} 
+                    id={`option-${idx}`} 
                     value={option.text}
                     checked={selectedOption === option.text}
                     onChange={handleOptionChange}
                   />
-                  {option.text}
-                </label>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: '20px' }}>
-            <button 
-              onClick={handleBack} 
-              disabled={currentQuestionIndex === 0} 
-              style={{ marginRight: '10px' }}
-            >
-              Back
-            </button>
-            <button 
-              onClick={handleNext} 
-              disabled={currentQuestionIndex === questions.length - 1}
-            >
-              Next
-            </button>
+                  <label className="form-check-label" htmlFor={`option-${idx}`}>
+                    {option.text}
+                  </label>
+                </div>
+              ))}
+            </form>
+            <div className="d-flex justify-content-between mt-4">
+              <button 
+                onClick={handleBack} 
+                disabled={currentQuestionIndex === 0} 
+                className="btn btn-outline-primary"
+              >
+                &laquo; Back
+              </button>
+              {currentQuestionIndex < questions.length - 1 && (
+                <button 
+                  onClick={handleNext} 
+                  className="btn btn-primary"
+                >
+                  Next &raquo;
+                </button>
+              )}
+              {currentQuestionIndex === questions.length - 1 && (
+                <button 
+                  onClick={handleSubmit} 
+                  className="btn btn-success"
+                >
+                  Submit Quiz!
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
-      
+
       {attempt && questions.length === 0 && (
-        <p>No questions found for this quiz.</p>
+        <div className="alert alert-warning" role="alert">
+          No questions found for this quiz.
+        </div>
       )}
     </div>
   );

@@ -18,7 +18,7 @@ export default function QuizListScreenControls({
 
   const createNewQuiz = async () => {
     if (!cid) return;
-    const quizName = "New Quiz";
+    const quizName = "New Blank Quiz";
     const newQuiz = { title: quizName, course: cid };
     const quiz = await coursesClient.createQuizForCourse(cid, newQuiz);
     dispatch(addQuiz(quiz));
@@ -33,7 +33,7 @@ export default function QuizListScreenControls({
         <button
           id="wd-btn"
           className="btn btn-lg bg-secondary me-1 float-end"
-          // onClick={handleNewQuiz}
+          onClick={handleNewQuiz}
         >
           <IoEllipsisVertical className="fs-4"
             style={{ bottom: "1px" }}
@@ -42,7 +42,7 @@ export default function QuizListScreenControls({
         <button
           id="wd-add-quiz-btn"
           className="btn btn-lg btn-danger me-1 float-end"
-          // onClick={handleNewQuiz}
+          onClick={handleNewQuiz}
         >
           <FaPlus
             className="position-relative me-2"

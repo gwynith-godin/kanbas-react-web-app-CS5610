@@ -68,3 +68,29 @@ export const deleteAttempt = async (attemptId: string) => {
   const response = await axios.delete(`${ATTEMPTS_API}/${attemptId}`);
   return response.data;
 };
+
+export const getAttemptCount = async (userId: string, quizId: string): Promise<number> => {
+  try {
+    const response = await axios.get(`${ATTEMPTS_API}/count`, {
+      params: { userId, quizId },
+    });
+    return response.data.count;
+  } catch (error) {
+    console.error("Error fetching attempt count:", error);
+    throw error;
+  }
+};
+
+export const getAttemptsByUserAndQuiz = async (userId: string, quizId: string): Promise<any[]> => {
+  try {
+    console.log(userId, quizId)
+    const response = await axios.get('/api/quizzes/attempt/all', {
+      params: { userId, quizId },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching attempts:", error);
+    throw error;
+  }
+};
+
