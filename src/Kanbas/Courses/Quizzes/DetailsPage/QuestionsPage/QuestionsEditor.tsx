@@ -75,6 +75,43 @@ export default function QuestionsEditor() {
     }
   }, [question]);
   
+
+  const renderQuestionDetails = (question: any) => {
+    switch (question.type) {
+        case "MultipleChoice":
+            return (
+                <div>
+                    <h6>Options:</h6>
+                    <ul>
+                        {question.options.map((option: any, index: number) => (
+                            <li key={index}>{option.text}</li>
+                        ))}
+                    </ul>
+                </div>
+            );
+        case "TrueFalse":
+            return (
+                <div>
+                    <p><strong>Answer:</strong> {question.trueFalse.answer ? "True" : "False"}</p>
+                </div>
+            );
+        case "FillInTheBlank":
+            return (
+                <div>
+                    <p><strong>Blank:</strong> {question.fillInTheBlank.blank}</p>
+                </div>
+            );
+        case "OpenResponse":
+            return (
+                <div>
+                    <p><strong>Response:</strong> {question.question}</p>
+                </div>
+            );
+        default:
+            return null;
+    }
+};
+
   if (!tempQuestion) return <div>Loading...</div>;
 
   return (
@@ -99,13 +136,16 @@ export default function QuestionsEditor() {
             />
           </div>
           <div>
-            <label>Type:</label>
-            <input
-              type="text"
+          <label>Type:</label>
+            <select
               value={tempQuestion.type}
-              onChange={(e) => handleFieldChange("type", e.target.value)}
               className="form-control"
-            />
+            >
+              <option value="MultipleChoice">Multiple Choice</option>
+              <option value="TrueFalse">True/False</option>
+              <option value="FillInTheBlank">Fill in the Blank</option>
+              <option value="OpenResponse">Open Response</option>
+            </select>
           </div>
           <div>
             <label>Points:</label>
@@ -118,25 +158,7 @@ export default function QuestionsEditor() {
           </div>
           <div>
             <h5>Options:</h5>
-            {tempQuestion.options.map((option, index) => (
-              <div key={index} style={{ marginBottom: "10px" }}>
-                <label>Option {index + 1}:</label>
-                <input
-                  type="text"
-                  value={option.text}
-                  onChange={(e) => handleOptionChange(index, "text", e.target.value)}
-                  className="form-control"
-                />
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={option.isCorrect}
-                    onChange={(e) => handleOptionChange(index, "isCorrect", e.target.checked)}
-                  />
-                  Is Correct
-                </label>
-              </div>
-            ))}
+            {renderQuestionDetails(tempQuestion)};
           </div>
           <div className="button-container" style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
             <button onClick={handleCancel} className="btn border-bottom border-secondary" style={{ backgroundColor: "#f5f5f5" }}>
