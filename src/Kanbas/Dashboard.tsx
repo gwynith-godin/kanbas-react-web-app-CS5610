@@ -34,13 +34,13 @@ export default function Dashboard({
 }) {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const { enrollments } = useSelector((state: any) => state.enrollmentsReducer);
-  const [enrollmentToDelete, setEnrollmentToDelete] = useState<{ _id: string; user: string; course: string; } | null>(null);
+  // const [enrollmentToDelete, setEnrollmentToDelete] = useState<{ _id: string; user: string; course: string; } | null>(null);
   const [coursesLoaded, setCoursesLoaded] = useState(false);
   const dispatch = useDispatch();
   const [unenrolledCourses, setUnenrolledCourses] = useState<any[]>([]);
 
   const [enrollmentFilterState, setEnrollmentFilterState] =
-    useState(currentUser.role === "FACULTY"? "all": "enrolled");
+    useState(currentUser.role === "ADMIN"? "all": "enrolled");
 
 
   const handleEnrollmentClick = async () => {
@@ -170,7 +170,7 @@ export default function Dashboard({
                     key={`/Kanbas/Courses/${course._id}/Home`}
                   >
                     <img
-                      src={`/images/${course.imageLink}`}
+                      src={`/images/reactjs.jpg`}
                       alt=""
                       width="100%"
                       height={160}
