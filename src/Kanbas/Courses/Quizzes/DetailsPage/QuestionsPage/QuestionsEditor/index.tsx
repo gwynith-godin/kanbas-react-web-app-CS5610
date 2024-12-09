@@ -1,84 +1,75 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { updateQuiz } from "../../../reducer"; // Redux action
 import * as client from "../../../client"; // API client
 import "./index.css";
-
-import { Quiz, Questions, Question, QuestionType } from "../interface"; // Interface imports
 import QuestionForm from "./QuestionForm";
 
 export default function QuestionsEditor() {
-  const {qid, questionId } = useParams<{ qid: string; questionId: string }>();
+  const { qid, questionId } = useParams<{ qid: string; questionId: string }>();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const [quiz, setQuiz] = useState<Quiz | null>(null); // Full quiz object
-  const [questionSet, setQuestionSet] = useState<Questions | null>(null); // Questions object
-  const [editedQuestion, setEditedQuestion] = useState<Question | null>(null); // Currently edited question
+  const [allQuestions, setAllQuestions] = useState<any[]>([]);
+  const [editedQuestion, setEditedQuestion] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch quiz and questions on load
-  useEffect(() => {
-    const fetchQuiz = async () => {
-      try {
-        console.log("Fetching quiz with ID:", qid);
-        const fetchedQuiz = await client.getQuizById(qid!);
-        console.log("Fetched Quiz Data:", fetchedQuiz);
-  
-        setQuiz(fetchedQuiz);
-  
-        const questionsObject: Questions = {
-          _id: fetchedQuiz._id,
-          quiz: fetchedQuiz._id,
-          questions: fetchedQuiz.questions,
-        };
-        console.log("Questions Object:", questionsObject);
-        setQuestionSet(questionsObject);
-  
-        const currentQuestion = questionsObject.questions.find(
-          (q) => q._id === questionId
-        );
-        console.log("Current Question:", currentQuestion);
-  
+  // Fetch all questions
+  const fetchQuestions = async () => {
+    try {
+      const questions = await client.getQuestions(qid);
+      setAllQuestions(questions);
+
+      // If a specific question ID is provided, set it as the edited question
+      if (questionId) {
+        const currentQuestion = questions.find((q: any) => q._id === questionId);
         if (currentQuestion) {
           setEditedQuestion(currentQuestion);
         } else {
-          console.error("Question not found in quiz.");
+          console.error("Question not found.");
         }
-      } catch (error) {
-        console.error("Error fetching quiz data:", error);
-      } finally {
-        setIsLoading(false);
       }
-    };
-  
-    fetchQuiz();
-  }, [qid, questionId]);
-  
-
-  // Handle updates to the question set
-  const updateQuestionList = (index: number, updatedQuestion: Question) => {
-    if (questionSet) {
-      const updatedQuestions = questionSet.questions.map((q, i) =>
-        i === index ? updatedQuestion : q
-      );
-      setQuestionSet({ ...questionSet, questions: updatedQuestions });
-      setEditedQuestion(updatedQuestion);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Save updates to the database
+  // Add a new question
+  const handleAddNewQuestion = async () => {
+    const newQuestion = {
+      type: "MultipleChoice",
+      title: "Default Title",
+      points: 0,
+      question: "Enter question here",
+      correctAnswer: "option 1",
+      options: [
+        { text: "option 1", isCorrect: false },
+        { text: "option 2", isCorrect: false },
+      ],
+    };
+    try {
+      const createdQuestion = await client.createQuestion(qid, newQuestion);
+      setAllQuestions([...allQuestions, createdQuestion]);
+      setEditedQuestion(createdQuestion); // Set the new question for editing
+    } catch (error) {
+      console.error("Error adding question:", error);
+    }
+  };
+
+  // Save updates to the current question
   const handleSave = async () => {
-    if (!qid || !quiz || !questionSet) return;
+    if (!editedQuestion) return;
 
     try {
-      const updatedQuiz = await client.updateQuizAndQuestion(
+      const updatedQuestion = await client.updateQuestion(
         qid,
-        quiz,
-        questionSet
+        editedQuestion._id,
+        editedQuestion
+      ) as any;
+      const updatedQuestions = allQuestions.map((q) =>
+        q._id === updatedQuestion._id ? updatedQuestion : q
       );
-      dispatch(updateQuiz(updatedQuiz)); // Sync with Redux
+      setAllQuestions(updatedQuestions);
       alert("Question saved successfully!");
       navigate(-1); // Navigate back
     } catch (error) {
@@ -86,78 +77,40 @@ export default function QuestionsEditor() {
     }
   };
 
-  // Add a new question
-  const newQuestion = () => {
-    if (questionSet) {
-      const newQuestion: Question = {
-          type: QuestionType.multipleChoice,
-          title: "",
-          points: 0,
-          question: "",
-          choices: [],
-          true_or_false: true,
-          blank: [],
-          _id: ""
-      };
-
-      const updatedQuestions = [...questionSet.questions, newQuestion];
-      setQuestionSet({ ...questionSet, questions: updatedQuestions });
-      setEditedQuestion(newQuestion); // Immediately edit the new question
+  // Delete a question
+  const handleDelete = async (questionId: string) => {
+    try {
+      await client.deleteQuestion(qid, questionId);
+      setAllQuestions(allQuestions.filter((q) => q._id !== questionId));
+    } catch (error) {
+      console.error("Error deleting question:", error);
     }
   };
 
-  // Handle cancellation
-  const handleCancel = () => {
-    navigate(-1);
-  };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
-  if (!quiz || !editedQuestion || !questionSet) {
-    return <div>Error: Question or quiz not found.</div>;
-  }
+  useEffect(() => {
+    fetchQuestions();
+  }, [qid, questionId]);
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="editor-container mt-5">
       <div style={{ marginLeft: "150px", marginRight: "150px" }}>
+        {editedQuestion ? (
+          <QuestionForm
+                      key={editedQuestion._id}
+                      question={editedQuestion}
+                      onQuestionChange={(updatedQuestion) => setEditedQuestion(updatedQuestion)} index={0} editing={false} deleteQuestion={function (index: number): void {
+                          throw new Error("Function not implemented.");
+                      } }          />
+        ) : (
+          <div>No question selected. Add or select a question to edit.</div>
 
-
-      <QuestionForm
-        key={editedQuestion._id}
-        question={editedQuestion}
-        index={questionSet.questions.findIndex((q) => q._id === editedQuestion._id)} // Pass index explicitly
-        onQuestionChange={updateQuestionList} // Let the function handle the logic
-        editing={true}
-        deleteQuestion={() => {}}   
-        />
-
+        )}
       </div>
       <br />
-      <div className="button-container">
-        <button
-          className="btn border-bottom border-secondary"
-          style={{ backgroundColor: "#f5f5f5", margin: "10px 0" }}
-          onClick={handleSave}
-        >
-          Save
-        </button>
-        <button
-          className="btn border-bottom border-danger"
-          style={{ backgroundColor: "#f5f5f5", margin: "10px 0" }}
-          onClick={handleCancel}
-        >
-          Cancel
-        </button>
-        <button
-          className="btn border-bottom border-primary"
-          style={{ backgroundColor: "#f5f5f5", margin: "10px 0" }}
-          onClick={newQuestion}
-        >
-          Add Question
-        </button>
-      </div>
       <hr />
     </div>
   );

@@ -18,6 +18,7 @@ import {
   EditorProvider,
   Toolbar,
 } from "react-simple-wysiwyg";
+import { useNavigate } from "react-router-dom";
 
 interface QuestionFormProps {
   index: number;
@@ -26,6 +27,7 @@ interface QuestionFormProps {
   onQuestionChange: (index: number, question: Question) => void;
   deleteQuestion: (index: number) => void;
 }
+
 
 export default function QuestionForm({
   index,
@@ -36,6 +38,7 @@ export default function QuestionForm({
 }: QuestionFormProps) {
   const [current, setCurrent] = useState<Question>(question);
   const [isEditing, setIsEditing] = useState<boolean>(editing);
+  const navigate = useNavigate();
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const updatedCurrent = { ...current, [e.target.name]: e.target.value };
@@ -76,14 +79,18 @@ export default function QuestionForm({
     setCurrent(updatedCurrent);
   };
 
+    // Handle cancellation
+  const handleCancel = () => {
+      navigate(-1);
+    };
+
   return (
     <div key={index}>
-      {isEditing ? (
         <div
           className="mx-3 mb-4 border border-secondary"
           style={{ padding: "0", position: "relative", width: "100%" }}
         >
-          {/* Quesiton editor header */}
+          {/* editor header */}
           <div className="row m-3">
             <div className="col-3">
               <input
@@ -307,6 +314,8 @@ export default function QuestionForm({
                 <br />
               </div>
             )}
+
+
             {current.type === QuestionType.fillInBlank && (
               <div className="container">
                 <ul className="list-group">
@@ -367,6 +376,8 @@ export default function QuestionForm({
                 <br />
               </div>
             )}
+
+
             {current.type === QuestionType.trueOrFalse && (
               <div className="container">
                 <div className="p-2">
@@ -404,6 +415,7 @@ export default function QuestionForm({
                 onClick={() => {
                   setIsEditing(false);
                   onQuestionChange(index, current);
+                  navigate(-1);
                 }}
               >
                 Update Question
@@ -413,8 +425,9 @@ export default function QuestionForm({
                 onClick={() => {
                   setCurrent(question);
                   setIsEditing(false);
+                  handleCancel();
                 }}
-              >
+              > 
                 Cancel
               </button>
             </div>
@@ -422,42 +435,6 @@ export default function QuestionForm({
           <br />
           <br />
         </div>
-      ) : (
-        <div
-          className="mx-3 mb-4 border border-secondary"
-          style={{ padding: "0", position: "relative", width: "100%" }}
-        >
-          <div
-            className="p-3 border-bottom border-secondary"
-            style={{ backgroundColor: "#f5f5f5", width: "100%" }}
-          >
-            <div className="float-end font-color-secondary">
-              {current.points} pts
-            </div>
-            <div className="fw-bold">Question {index + 1}</div>
-          </div>
-          <div style={{ width: "100%" }}>
-            <div id="question-description" className="p-4 my-3">
-              <div
-                className="mb-2"
-                dangerouslySetInnerHTML={{ __html: current.question }}
-              />
-              <button
-                className="btn btn-danger btn-sm float-end ms-3"
-                onClick={() => setIsEditing(true)}
-              >
-                Edit
-              </button>
-              <button
-                className="btn btn-danger btn-sm float-end"
-                onClick={() => deleteQuestion(index)}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

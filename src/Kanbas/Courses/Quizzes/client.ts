@@ -10,6 +10,12 @@ const ATTEMPTS_API = `${QUIZZES_API}/attempt`;
 
 const axiosWithCredentials = axios.create({ withCredentials: true });
 
+export const updateQuestion = async (qid: string | undefined, _id: any, editedQuestion: any) => {
+
+  const response = await axios.put(`${QUIZZES_API}/${qid}/question/${_id}`, editedQuestion);
+  return response.data;
+}
+
 export const updateQuiz = async (quiz: any) => {
     const { data } = await axiosWithCredentials.put(`${QUIZZES_API}/${quiz._id}`, quiz);
     return data;
@@ -175,4 +181,5 @@ export const getAttemptsByUserAndQuiz = async (userId: string, quizId: string): 
     throw error;
   }
 };
+
 
