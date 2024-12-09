@@ -170,7 +170,7 @@ export default function Dashboard({
                     key={`/Kanbas/Courses/${course._id}/Home`}
                   >
                     <img
-                      src={`/images/${course.imageLink}`}
+                      src={`/images/reactjs.jpg`}
                       alt=""
                       width="100%"
                       height={160}
