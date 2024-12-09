@@ -1,0 +1,92 @@
+body   {  margin: 0;  padding: 0;  }
+body * {  font-family: Arial, Helvetica, sans-serif;  }
+
+@media (min-width: 768px) {
+  #wd-kanbas .wd-main-content-offset {
+    padding-left: 140px !important;
+  }
+}
+
+.list-group.wd > .list-group-item.active {
+    color: black;
+    background-color: white;
+    border-left: 3px solid black !important;
+}
+
+.btn-secondary {
+--bs-btn-color: #000 !important;
+--bs-btn-bg: #c7cdd1 !important;
+--bs-btn-border-color: #c7cdd1 !important;
+--bs-btn-hover-color: #fff !important;
+}
+.bg-secondary {
+--bs-secondary-rgb: 199, 205, 209;
+}
+.list-group-item {
+--bs-list-group-border-color: gray;
+}
+.wd-lesson {
+border-left: 3px solid green !important;
+}
+
+.green-icon {
+    color: green;
+  }
+  
+.wd-assignment-color-red { color: #ff7070;
+                            font-size: 14px;
+                            font-weight: bold; 
+}
+
+.wd-assignment-bold{ color: #333333;
+    font-size: 14px;
+    font-weight: bold; 
+}
+
+.wd-assignment-regular{ color: #333333;
+    font-size: 14px;
+}
+
+.wd-assignment-name{ color: #333333;
+    font-size: 20px;
+    font-weight: bold; 
+}
+
+.wd-rounded-corners-all-around {
+    border-radius: 50px;
+ }
+
+.form-group-border {
+border: 1px solid #ccc; /* Light grey border */
+border-radius: 5px;     /* Rounded corners */
+padding: 15px;          /* Padding inside the border */
+margin-bottom: 15px;    /* Space between form groups */
+}
+
+.wd-checkbox-regular{ color: #333333;
+    font-size: 16px;
+}
+
+.wd-checkbox-bold{ color: #333333;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.wd-signout{
+    background-color: red;
+    border-color: red;
+}
+
+.wd-title{
+    color: #333333;
+    font-size: 20px;
+    font-weight: bold; 
+
+}
+
+.wd-assignment-icon{ color: #333333;
+    font-size: 20px;
+    background-color: #c7cdd1 !important;
+    border-color: gray !important;
+
+}
