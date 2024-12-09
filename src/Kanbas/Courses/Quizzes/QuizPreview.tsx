@@ -1,6 +1,13 @@
 // QuizPreview.tsx
 import React, { useEffect, useState } from 'react';
-import { getQuestions, createAttempt, updateAttempt, getAttemptCount, findQuizById } from './client'; 
+import { 
+  getQuestions, 
+  createAttempt, 
+  updateAttempt, 
+  getAttemptCount, 
+  findQuizById, 
+  getMostRecentAttempt // Import the new function
+} from './client'; 
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
@@ -16,6 +23,10 @@ export default function QuizPreview() {
   const [maxAttempts, setMaxAttempts] = useState<number>(0);
   const [currentAttemptCount, setCurrentAttemptCount] = useState<number>(0);
   const [isAttemptLimitChecked, setIsAttemptLimitChecked] = useState<boolean>(false);
+
+  // New state variables for recent attempt
+  const [recentAttempt, setRecentAttempt] = useState<any>(null);
+  const [isRecentAttemptLoading, setIsRecentAttemptLoading] = useState<boolean>(false);
 
   const { qid } = useParams();
   const navigate = useNavigate();
@@ -38,11 +49,20 @@ export default function QuizPreview() {
           const attemptCount = await getAttemptCount(currentUser._id, qid);
           setCurrentAttemptCount(attemptCount);
 
+          // If user has reached max attempts, fetch the most recent attempt
+          if (attemptCount >= quiz.howManyAttempts) {
+            setIsRecentAttemptLoading(true);
+            const recent = await getMostRecentAttempt(currentUser._id, qid);
+            setRecentAttempt(recent);
+            setIsRecentAttemptLoading(false);
+          }
+
           setIsAttemptLimitChecked(true);
           setIsLoading(false);
         } catch (error) {
           console.error("Error fetching data:", error);
           setIsLoading(false);
+          setIsRecentAttemptLoading(false);
         }
       }
     };
@@ -160,11 +180,11 @@ export default function QuizPreview() {
     }
   };
 
-  if (isLoading || !isAttemptLimitChecked) {
+  if (isLoading || !isAttemptLimitChecked || isRecentAttemptLoading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
         <div className="spinner-border text-primary" role="status">
-          <span className="sr-only">Loading questions...</span>
+          <span className="sr-only">Loading...</span>
         </div>
       </div>
     );
@@ -194,9 +214,33 @@ export default function QuizPreview() {
               </button>
             </>
           ) : (
-            <div className="alert alert-info" role="alert">
-              All attempts used.
-            </div>
+            <>
+              {isRecentAttemptLoading ? (
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="sr-only">Loading recent attempt...</span>
+                  </div>
+                </div>
+              ) : recentAttempt ? (
+                <div className="card">
+                  <div className="card-body">
+                    <h5 className="card-title">Your Most Recent Attempt</h5>
+                    <p className="card-text"><strong>Score:</strong> {recentAttempt.score}</p>
+                    <p className="card-text"><strong>Date:</strong> {new Date(recentAttempt.createdAt).toLocaleString()}</p>
+                    <button 
+                      onClick={() => navigate(`${pathname}/${recentAttempt._id}/review`)} 
+                      className="btn btn-info"
+                    >
+                      Review Attempt
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="alert alert-info" role="alert">
+                  No attempts found.
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
@@ -263,4 +307,5 @@ export default function QuizPreview() {
     </div>
   );
 }
+
 

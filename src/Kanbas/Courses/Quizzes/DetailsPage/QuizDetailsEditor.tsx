@@ -54,6 +54,21 @@ export default function QuizEditor() {
         });
     };
 
+    // Updated handlePublish Function
+    const handlePublish = async (e: FormEvent) => {
+        e.preventDefault();
+        if (!quizData) return;
+
+        const updatedQuizData = { ...quizData, published: true };
+
+        try {
+            await client.updateQuiz(updatedQuizData);
+            navigate(-1);
+        } catch (err) {
+            console.error("Error publishing quiz:", err);
+        }
+    };
+
     const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (!quizData) return;
 
@@ -72,6 +87,7 @@ export default function QuizEditor() {
         return localISOTime;
     };
 
+    // Updated handleSave Function
     const handleSave = async (e: FormEvent) => {
         e.preventDefault();
         if (!quizData) return;
@@ -397,6 +413,9 @@ export default function QuizEditor() {
                 <div className="mb-3">
                     <button type="submit" className="btn btn-primary me-2" onClick={handleSave}>
                         Save Changes
+                    </button>
+                    <button type="submit" className="btn btn-primary me-2" onClick={handlePublish}>
+                        Save & Publish
                     </button>
                     <button type="button" className="btn btn-secondary" onClick={handleCancel}>
                         Cancel

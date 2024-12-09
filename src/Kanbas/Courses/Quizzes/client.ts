@@ -94,3 +94,15 @@ export const getAttemptsByUserAndQuiz = async (userId: string, quizId: string): 
   }
 };
 
+export const getMostRecentAttempt = async (userId: string, quizId: string): Promise<any> => {
+  try {
+      const response = await axios.get(`${ATTEMPTS_API}/recent`, {
+          params: { userId, quizId },
+      });
+      return response.data;
+  } catch (error) {
+      console.error("Error fetching the most recent attempt:", error);
+      throw error;
+  }
+};
+

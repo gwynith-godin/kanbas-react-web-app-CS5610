@@ -159,6 +159,7 @@ export default function Dashboard({
             // )
             .map((course) => (
               <div
+                key={course._id}
                 className="wd-dashboard-course col"
                 style={{ width: "270px" }}
                 id={course.cid}

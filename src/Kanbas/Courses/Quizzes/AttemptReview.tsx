@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { findAttemptById, getQuestions } from './client';
+import { findAttemptById, getQuestions, updateAttempt } from './client';
 
 export default function AttemptReview() {
   const { attemptId } = useParams();
@@ -12,13 +12,13 @@ export default function AttemptReview() {
 
   useEffect(() => {
     if (attemptId) {
-      // First, fetch the attempt
+      // Fetch the attempt
       findAttemptById(attemptId)
         .then((attemptData) => {
           setAttempt(attemptData);
           setIsAttemptLoading(false);
 
-          // Once we have the attempt, we know the quizId
+          // Fetch the questions using quizId from the attempt
           const quizId = attemptData.quizId;
           if (quizId) {
             getQuestions(quizId)
@@ -41,6 +41,32 @@ export default function AttemptReview() {
         });
     }
   }, [attemptId]);
+
+  // New useEffect to handle score calculation and updating
+  useEffect(() => {
+    const updateScore = async () => {
+      if (!isAttemptLoading && !isQuestionsLoading && attempt) {
+        const totalAnswers = attempt.answers.length;
+        const correctAnswers = attempt.answers.filter((answer: any) => answer.correct).length;
+        const scorePercentage =
+          totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(2) : '0.00';
+
+        // Check if the score is already up-to-date to prevent unnecessary updates
+        if (attempt.score !== scorePercentage) {
+          try {
+            const updatedAttemptData = { ...attempt, score: scorePercentage };
+            await updateAttempt(attempt._id, updatedAttemptData);
+            setAttempt(updatedAttemptData); // Update local state with new score
+            console.log('Attempt score updated successfully.');
+          } catch (error) {
+            console.error('Error updating attempt:', error);
+          }
+        }
+      }
+    };
+
+    updateScore();
+  }, [isAttemptLoading, isQuestionsLoading, attempt]);
 
   if (isAttemptLoading || isQuestionsLoading) {
     return (
@@ -73,7 +99,7 @@ export default function AttemptReview() {
     return acc;
   }, {});
 
-  // Calculate score percentage
+  // Calculate score percentage for display (redundant if already stored in attempt)
   const totalAnswers = attempt.answers.length;
   const correctAnswers = attempt.answers.filter((answer: any) => answer.correct).length;
   const scorePercentage =
@@ -132,6 +158,7 @@ export default function AttemptReview() {
     </div>
   );
 }
+
 
 
 
