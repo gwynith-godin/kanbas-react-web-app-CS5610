@@ -10,7 +10,7 @@ import PeopleTableCourses from "./People/TableCourses";
 import Quizzes from "./Quizzes";
 import DetailsPage from "./Quizzes/DetailsPage/DetailsPage";
 import QuizEditor from "./Quizzes/DetailsPage/QuizDetailsEditor";
-import QuestionsEditor from "./Quizzes/DetailsPage/QuestionsPage/QuestionsEditor";
+import QuestionsEditor from "./Quizzes/DetailsPage/QuestionsPage/QuestionsEditor/";
 import QuestionsList from "./Quizzes/DetailsPage/QuestionsPage/QuestionsList";
 import QuizPreview from "./Quizzes/QuizPreview";
 import AttemptReview from "./Quizzes/AttemptReview";
