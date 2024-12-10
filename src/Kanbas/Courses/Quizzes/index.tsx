@@ -19,6 +19,7 @@ import {
 import QuizListScreenControls from "./QuizListScreenControls";
 import AdminRestricted from "../../Common/ProtectedRoutes";
 import GreenCheckmark from "../Modules/GreenCheckmark";
+import QuizOptionsMenu from "./QuizOptionsMenu";
 
 export default function Quizzes() {
   const { cid } = useParams();
@@ -83,6 +84,10 @@ export default function Quizzes() {
     } else if (quiz.published) {
       navigate(`${pathname}/${quiz._id}/preview`);
     }
+  };
+
+  const handleEditQuiz = (quiz: any) => {
+    navigate(`${pathname}/${quiz._id}/edit`);
   };
 
   const createNewQuiz = async () => {
@@ -186,7 +191,7 @@ export default function Quizzes() {
                     <FacultyAndAdminRestricted>
                       <button
                         type="button"
-                        className="btn btn-lg me-1 float-end"
+                        className="btn btn-lg me-1"
                         onClick={(e) => {
                           e.stopPropagation();
                           handlePublishToggle(quiz);
@@ -194,6 +199,7 @@ export default function Quizzes() {
                       >
                         {quiz.published ? <LessonControlButtons /> : <LessonControlButtonsLight />}
                       </button>
+                      <QuizOptionsMenu quiz={quiz} onEdit={handleEditQuiz} />
                     </FacultyAndAdminRestricted>
                   </div>
                 </li>

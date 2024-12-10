@@ -224,7 +224,7 @@ export default function QuizPreview() {
               ) : recentAttempt ? (
                 <div className="card">
                   <div className="card-body">
-                    <h5 className="card-title">Your Most Recent Attempt</h5>
+                    <h5 className="card-title">All attempts used. Your Most Recent Attemp:t</h5>
                     <p className="card-text"><strong>Score:</strong> {recentAttempt.score}</p>
                     <p className="card-text"><strong>Date:</strong> {new Date(recentAttempt.createdAt).toLocaleString()}</p>
                     <button 
