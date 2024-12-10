@@ -53,7 +53,7 @@ export default function Users() {
    fetchUsers();
  }, [uid]);
  return (
-   <div>
+   <div className = "ms-3">
       <button onClick={createUser} className="float-end btn btn-danger wd-add-people">
         <FaPlus className="me-2" />
         Users

@@ -25,7 +25,7 @@ export default function Signin() {
     }
   };
   return (
-    <div id="wd-signin-screen">
+    <div id="wd-signin-screen" className="ms-3">
       <h1>Sign in</h1>
       <input defaultValue={credentials.username}
              onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}

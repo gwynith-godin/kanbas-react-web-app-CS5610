@@ -1,4 +1,3 @@
-// QuizOptionsMenu.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { FaEdit, FaTrash, FaCircle } from "react-icons/fa";
