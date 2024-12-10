@@ -11,7 +11,7 @@ const ATTEMPTS_API = `${QUIZZES_API}/attempt`;
 const axiosWithCredentials = axios.create({ withCredentials: true });
 
 export const updateQuestion = async (qid: string | undefined, _id: any, editedQuestion: any) => {
-
+  console.log("saving question", qid);
   const response = await axios.put(`${QUIZZES_API}/${qid}/question/${_id}`, editedQuestion);
   return response.data;
 }
@@ -48,6 +48,11 @@ export const createQuiz = async (courseId: string, quiz: any) => {
 
 export const getQuestions = async (quizId: any) => {
   const response = await axios.get(`${QUIZZES_API}/${quizId}/questions`);
+  return response.data;
+}
+
+export const getQuestionById = async (quizId: any, questionId: any) => {
+  const response = await axios.get(`${QUIZZES_API}/${quizId}/question/${questionId}`);
   return response.data;
 }
 
@@ -146,7 +151,7 @@ export const findAttemptById = async (attemptId: string) => {
 
 // Update an attempt by ID
 export const updateAttempt = async (attemptId: string, updatedData: any) => {
-  console.log("attempt", attemptId)
+  console.log("attempt", updatedData)
   const response = await axios.put(`${ATTEMPTS_API}/${attemptId}`, updatedData);
   return response.data;
 };

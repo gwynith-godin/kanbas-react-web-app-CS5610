@@ -1,4 +1,3 @@
-// QuizPreview.tsx
 import React, { useEffect, useState } from 'react';
 import { 
   getQuestions, 
@@ -6,7 +5,7 @@ import {
   updateAttempt, 
   getAttemptCount, 
   findQuizById, 
-  getMostRecentAttempt // Import the new function
+  getMostRecentAttempt 
 } from './client'; 
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -19,12 +18,10 @@ export default function QuizPreview() {
   const [answers, setAnswers] = useState<any[]>([]); 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   
-  // New state variables for quiz details and attempt count
   const [maxAttempts, setMaxAttempts] = useState<number>(0);
   const [currentAttemptCount, setCurrentAttemptCount] = useState<number>(0);
   const [isAttemptLimitChecked, setIsAttemptLimitChecked] = useState<boolean>(false);
 
-  // New state variables for recent attempt
   const [recentAttempt, setRecentAttempt] = useState<any>(null);
   const [isRecentAttemptLoading, setIsRecentAttemptLoading] = useState<boolean>(false);
 
@@ -35,7 +32,7 @@ export default function QuizPreview() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (qid) {
+      if (qid && currentUser?._id) {
         try {
           // Fetch quiz details to get maxAttempts
           const quiz = await findQuizById(qid);
@@ -87,19 +84,37 @@ export default function QuizPreview() {
 
   const currentQuestion = questions[currentQuestionIndex];
 
-  const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOption(e.target.value);
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedOption(e.target.value);
+  };
+
+  const determineCorrectness = (question: any, response: string | null) => {
+    if (!response || !question || !question.correctAnswers) return false;
+    const trimmedResponse = response.trim().toLowerCase();
+    const correctSet = question.correctAnswers.map((ans: string) => ans.toLowerCase());
+    console.log(correctSet);
+    console.log(trimmedResponse);
+    console.log(correctSet.includes(trimmedResponse));
+    return correctSet.includes(trimmedResponse);
   };
 
   const saveAndUpdateAttempt = async (newIndex: number) => {
     if (!attempt) return;
 
-    const questionId = currentQuestion?._id;
+    const question = currentQuestion;
+    const questionId = question?._id;
     const updatedAnswers = [...answers];
 
     if (questionId && selectedOption !== null) {
+      const isCorrect = determineCorrectness(question, selectedOption);
+      console.log(isCorrect);
       const existingIndex = updatedAnswers.findIndex(a => a.questionId === questionId);
-      const newAnswer = { questionId: questionId, selectedOption };
+      const newAnswer = { questionId: questionId, selectedOption, correct: isCorrect };
+      console.log(newAnswer);
 
       if (existingIndex === -1) {
         updatedAnswers.push(newAnswer);
@@ -109,6 +124,7 @@ export default function QuizPreview() {
 
       try {
         const updatedAttemptData = { ...attempt, answers: updatedAnswers };
+        console.log(updatedAttemptData);
         const updatedAttempt = await updateAttempt(attempt._id, updatedAttemptData);
         setAttempt(updatedAttempt);
         setAnswers(updatedAnswers);
@@ -130,7 +146,15 @@ export default function QuizPreview() {
     } else {
       // No selected option, just navigate without updating attempt answers
       setCurrentQuestionIndex(newIndex);
-      setSelectedOption(null);
+
+      // Pre-select previously chosen option if any
+      const nextQuestionId = questions[newIndex]?._id;
+      if (nextQuestionId) {
+        const previouslySelected = updatedAnswers.find(a => a.questionId === nextQuestionId);
+        setSelectedOption(previouslySelected ? previouslySelected.selectedOption : null);
+      } else {
+        setSelectedOption(null);
+      }
     }
   };
 
@@ -149,12 +173,14 @@ export default function QuizPreview() {
   const handleSubmit = async () => {
     // Final save before submitting
     if (!attempt) return;
-    const questionId = currentQuestion?._id;
+    const question = currentQuestion;
+    const questionId = question?._id;
     const updatedAnswers = [...answers];
 
     if (questionId && selectedOption !== null) {
+      const isCorrect = determineCorrectness(question, selectedOption);
       const existingIndex = updatedAnswers.findIndex(a => a.questionId === questionId);
-      const newAnswer = { questionId: questionId, selectedOption };
+      const newAnswer = { questionId, selectedOption, correct: isCorrect };
 
       if (existingIndex === -1) {
         updatedAnswers.push(newAnswer);
@@ -205,7 +231,7 @@ export default function QuizPreview() {
         <div className="text-center">
           {currentAttemptCount < maxAttempts ? (
             <>
-              <p className="lead">Ready to start the quiz? Warning: this will start a quiz attempt!</p>
+              <p className="lead">Ready to start the quiz? This will start a new attempt!</p>
               <button 
                 onClick={handleStart} 
                 className="btn btn-primary btn-lg"
@@ -224,7 +250,7 @@ export default function QuizPreview() {
               ) : recentAttempt ? (
                 <div className="card">
                   <div className="card-body">
-                    <h5 className="card-title">All attempts used. Your Most Recent Attemp:t</h5>
+                    <h5 className="card-title">All attempts used. Your Most Recent Attempt:</h5>
                     <p className="card-text"><strong>Score:</strong> {recentAttempt.score}</p>
                     <p className="card-text"><strong>Date:</strong> {new Date(recentAttempt.createdAt).toLocaleString()}</p>
                     <button 
@@ -253,22 +279,70 @@ export default function QuizPreview() {
             </h5>
             <p className="card-text">{currentQuestion.question}</p>
             <form>
-              {currentQuestion.options?.map((option: any, idx: any) => (
+              {currentQuestion.type === 'MultipleChoice' && currentQuestion.options?.map((option: string, idx: number) => (
                 <div className="form-check" key={idx}>
                   <input 
                     className="form-check-input" 
                     type="radio" 
                     name={`question-${currentQuestionIndex}`} 
                     id={`option-${idx}`} 
-                    value={option.text}
-                    checked={selectedOption === option.text}
+                    value={option}
+                    checked={selectedOption === option}
                     onChange={handleOptionChange}
                   />
                   <label className="form-check-label" htmlFor={`option-${idx}`}>
-                    {option.text}
+                    {option}
                   </label>
                 </div>
               ))}
+
+              {currentQuestion.type === 'TrueFalse' && (
+                <>
+                  <div className="form-check">
+                    <input 
+                      className="form-check-input"
+                      type="radio"
+                      name={`question-${currentQuestionIndex}`}
+                      id="true-option"
+                      value="true"
+                      checked={selectedOption === 'true'}
+                      onChange={handleOptionChange}
+                    />
+                    <label className="form-check-label" htmlFor="true-option">
+                      True
+                    </label>
+                  </div>
+                  <div className="form-check">
+                    <input 
+                      className="form-check-input"
+                      type="radio"
+                      name={`question-${currentQuestionIndex}`}
+                      id="false-option"
+                      value="false"
+                      checked={selectedOption === 'false'}
+                      onChange={handleOptionChange}
+                    />
+                    <label className="form-check-label" htmlFor="false-option">
+                      False
+                    </label>
+                  </div>
+                </>
+              )}
+
+              {currentQuestion.type === 'FillInTheBlank' && (
+                <div className="mb-3">
+                  <label htmlFor={`fill-blank-${currentQuestionIndex}`} className="form-label">
+                    Your Answer:
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id={`fill-blank-${currentQuestionIndex}`}
+                    value={selectedOption ?? ''}
+                    onChange={handleTextChange}
+                  />
+                </div>
+              )}
             </form>
             <div className="d-flex justify-content-between mt-4">
               <button 
@@ -307,5 +381,3 @@ export default function QuizPreview() {
     </div>
   );
 }
-
-

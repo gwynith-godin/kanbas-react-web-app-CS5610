@@ -42,16 +42,16 @@ export default function AttemptReview() {
     }
   }, [attemptId]);
 
-  // New useEffect to handle score calculation and updating
+  // After attempt and questions are loaded, calculate and update the score if needed
   useEffect(() => {
     const updateScore = async () => {
       if (!isAttemptLoading && !isQuestionsLoading && attempt) {
         const totalAnswers = attempt.answers.length;
-        const correctAnswers = attempt.answers.filter((answer: any) => answer.correct).length;
+        const correctCount = attempt.answers.filter((answer: any) => answer.correct).length;
         const scorePercentage =
-          totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(2) : '0.00';
+          totalAnswers > 0 ? ((correctCount / totalAnswers) * 100).toFixed(2) : '0.00';
 
-        // Check if the score is already up-to-date to prevent unnecessary updates
+        // Update attempt score if not up-to-date
         if (attempt.score !== scorePercentage) {
           try {
             const updatedAttemptData = { ...attempt, score: scorePercentage };
@@ -99,11 +99,11 @@ export default function AttemptReview() {
     return acc;
   }, {});
 
-  // Calculate score percentage for display (redundant if already stored in attempt)
+  // Calculate score percentage for display
   const totalAnswers = attempt.answers.length;
-  const correctAnswers = attempt.answers.filter((answer: any) => answer.correct).length;
+  const correctCount = attempt.answers.filter((answer: any) => answer.correct).length;
   const scorePercentage =
-    totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(2) : '0.00';
+    totalAnswers > 0 ? ((correctCount / totalAnswers) * 100).toFixed(2) : '0.00';
 
   return (
     <div className="container py-4">
@@ -126,8 +126,9 @@ export default function AttemptReview() {
         <div>
           {attempt.answers.map((answer: any, idx: number) => {
             const question = questionMap[answer.questionId];
+            const correctAnswers = question?.correctAnswers || [];
             return (
-              <div key={answer._id} className="card mb-4">
+              <div key={idx} className="card mb-4">
                 <div className="card-body">
                   <h5 className="card-title">Question {idx + 1}</h5>
                   <p className="card-text">
@@ -142,9 +143,9 @@ export default function AttemptReview() {
                       <span className="badge bg-danger ms-2">Incorrect</span>
                     )}
                   </p>
-                  {!answer.correct && question && (
+                  {!answer.correct && question && correctAnswers.length > 0 && (
                     <p className="card-text">
-                      <strong>Correct Answer:</strong> {question.correctAnswer}
+                      <strong>Correct Answer(s):</strong> {correctAnswers.join(', ')}
                     </p>
                   )}
                 </div>
@@ -158,6 +159,7 @@ export default function AttemptReview() {
     </div>
   );
 }
+
 
 
 

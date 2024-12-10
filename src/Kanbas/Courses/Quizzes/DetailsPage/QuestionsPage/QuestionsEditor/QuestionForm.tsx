@@ -1,6 +1,6 @@
 import "./index.css";
 import { useState } from "react";
-import { QuestionType, Question, Choice } from "../interface";
+import { useNavigate } from "react-router-dom";
 import { GoTrash } from "react-icons/go";
 import {
   BtnBold,
@@ -18,423 +18,342 @@ import {
   EditorProvider,
   Toolbar,
 } from "react-simple-wysiwyg";
-import { useNavigate } from "react-router-dom";
 
-interface QuestionFormProps {
-  index: number;
-  editing: boolean;
-  question: Question;
-  onQuestionChange: (index: number, question: Question) => void;
-  deleteQuestion: (index: number) => void;
+export enum QuestionType {
+  MultipleChoice = "MultipleChoice",
+  TrueFalse = "TrueFalse",
+  FillInTheBlank = "FillInTheBlank",
 }
 
+export interface Question {
+  _id?: string;
+  quizId?: string;
+  type: QuestionType;
+  title: string;
+  points: number;
+  question: string;
+  correctAnswers?: string[]; // For correct answers (MCQ: one string, TF: ["True"] or ["False"], FIB: multiple strings)
+  options?: string[];        // For multiple choice options
+}
 
-export default function QuestionForm({
-  index,
-  editing,
-  question,
-  onQuestionChange,
-  deleteQuestion,
-}: QuestionFormProps) {
-  const [current, setCurrent] = useState<Question>(question);
-  const [isEditing, setIsEditing] = useState<boolean>(editing);
+interface QuestionFormProps {
+  question: Question;
+  onSave: (updatedQuestion: Question) => void;
+}
+
+export default function QuestionForm({ question, onSave }: QuestionFormProps) {
   const navigate = useNavigate();
 
-  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedCurrent = { ...current, [e.target.name]: e.target.value };
-    setCurrent(updatedCurrent);
+  const [current, setCurrent] = useState<Question>(() => {
+    const initial = { ...question };
+    // Ensure arrays are defined
+    initial.correctAnswers = initial.correctAnswers || [];
+    initial.options = initial.options || [];
+    return initial;
+  });
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setCurrent({ ...current, [e.target.name]: e.target.value });
   };
 
-  const onSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const updatedCurrent = { ...current, [e.target.name]: e.target.value };
-    setCurrent(updatedCurrent);
+  const handlePointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrent({ ...current, points: parseInt(e.target.value) });
   };
 
-  const handleChoiceCorrectChange = (index: number) => {
-    const updatedChoices = current.choices?.map((choice, i) =>
-      i === index ? { ...choice, correct: true } : { ...choice, correct: false }
-    );
-    const updatedCurrent = { ...current, choices: updatedChoices };
-    setCurrent(updatedCurrent);
+  // MULTIPLE CHOICE HANDLERS
+  const handleOptionTextChange = (index: number, value: string) => {
+    const updatedOptions = current.options?.map((opt, i) => (i === index ? value : opt));
+    setCurrent({ ...current, options: updatedOptions });
   };
 
-  const handleChoiceChange = (index: number, value: string) => {
-    const updatedChoices = current.choices?.map((choice, i) =>
-      i === index ? { ...choice, choice: value } : choice
-    );
-    const updatedCurrent = { ...current, choices: updatedChoices };
-    setCurrent(updatedCurrent);
+  const handleAddOption = () => {
+    const updatedOptions = [...(current.options || []), ""];
+    setCurrent({ ...current, options: updatedOptions });
   };
 
+  const handleDeleteOption = (index: number) => {
+    const updatedOptions = current.options?.filter((_, i) => i !== index);
+    setCurrent({ ...current, options: updatedOptions });
+    // If the deleted option was the correct answer, clear correctAnswers
+    if (current.correctAnswers && current.correctAnswers[0] === current.options?.[index]) {
+      setCurrent({ ...current, options: updatedOptions, correctAnswers: [] });
+    }
+  };
+
+  const handleSelectCorrectOption = (index: number) => {
+    const chosenOption = current.options?.[index] || "";
+    setCurrent({ ...current, correctAnswers: [chosenOption] });
+  };
+
+  // FILL IN THE BLANK HANDLERS (Use correctAnswers array directly)
   const handleBlankChange = (index: number, value: string) => {
-    const updatedBlanks = current.blank?.map((blank, i) =>
-      i === index ? value : blank
-    );
-    const updatedCurrent = { ...current, blank: updatedBlanks };
-    setCurrent(updatedCurrent);
+    const updatedAnswers = current.correctAnswers?.map((ans, i) => (i === index ? value : ans));
+    setCurrent({ ...current, correctAnswers: updatedAnswers });
   };
 
+  const handleAddBlank = () => {
+    const updatedAnswers = [...(current.correctAnswers || []), ""];
+    setCurrent({ ...current, correctAnswers: updatedAnswers });
+  };
+
+  const handleDeleteBlank = (index: number) => {
+    const updatedAnswers = current.correctAnswers?.filter((_, i) => i !== index);
+    setCurrent({ ...current, correctAnswers: updatedAnswers });
+  };
+
+  // TRUE/FALSE HANDLER
   const handleTrueFalseChange = (value: boolean) => {
-    const updatedCurrent = { ...current, true_or_false: value };
-    setCurrent(updatedCurrent);
+    // True or False means correctAnswers = ["True"] or ["False"]
+    setCurrent({ ...current, correctAnswers: [value ? "True" : "False"] });
   };
 
-    // Handle cancellation
+  // RICH TEXT EDITOR HANDLER
+  const handleEditorChange = (e: any) => {
+    setCurrent({ ...current, question: e.target.value });
+  };
+
+  const handleSave = () => {
+    onSave(current);
+  };
+
   const handleCancel = () => {
-      navigate(-1);
-    };
+    navigate(-1);
+  };
 
   return (
-    <div key={index}>
-        <div
-          className="mx-3 mb-4 border border-secondary"
-          style={{ padding: "0", position: "relative", width: "100%" }}
-        >
-          {/* editor header */}
-          <div className="row m-3">
-            <div className="col-3">
+    <div className="mx-3 mb-4 border border-secondary" style={{ width: "100%" }}>
+      <div className="row m-3">
+        <div className="col-3">
+          <input
+            placeholder="Question Title"
+            type="text"
+            value={current.title || ""}
+            name="title"
+            onChange={handleInputChange}
+            className="form-control"
+          />
+        </div>
+        <div className="col-3">
+          <select
+            className="form-select"
+            value={current.type}
+            name="type"
+            onChange={handleInputChange}
+          >
+            <option value={QuestionType.MultipleChoice}>Multiple Choice</option>
+            <option value={QuestionType.TrueFalse}>True/False</option>
+            <option value={QuestionType.FillInTheBlank}>Fill in the blanks</option>
+          </select>
+        </div>
+        <div className="col">
+          <div className="row g-2 float-end">
+            <div className="col-2 pt-2">
+              <label htmlFor="points">Pts:</label>
+            </div>
+            <div className="col-4">
               <input
-                placeholder="Question Title"
-                type="text"
-                value={current.title}
-                name="title"
-                onChange={onInputChange}
-                className="form-control "
-                //style={{ width: `${question.title.length || 10}ch` }}
+                className="form-control"
+                type="number"
+                id="points"
+                name="points"
+                value={current.points || 0}
+                onChange={handlePointsChange}
               />
             </div>
-            <div className="col-3">
-              <select
-                className="form-select select-auto-width"
-                value={current.type}
-                name="type"
-                onChange={onSelectChange}
-              >
-                <option value={QuestionType.multipleChoice}>
-                  Multiple Choice
-                </option>
-                <option value={QuestionType.trueOrFalse}>True/False</option>
-                <option value={QuestionType.fillInBlank}>
-                  Fill in the blanks
-                </option>
-              </select>
-            </div>
-            <div className="col">
-              <div className="row g-2 float-end">
-                <div className="col-2 pt-2">
-                  <label htmlFor="points">Pts:</label>
-                </div>
-                <div className="col-4">
-                  <input
-                    className="form-control"
-                    type="number"
-                    id="points"
-                    name="points"
-                    value={current.points}
-                    onChange={(e) => {
-                      setCurrent({
-                        ...current,
-                        points: parseInt(e.target.value),
-                      });
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
           </div>
-          <hr />
-
-          <div className="container">
-            {/* Question tips by type */}
-            <>
-              {current.type === QuestionType.multipleChoice && (
-                <>
-                  <small>
-                    Enter your question and multiple answers, then select the
-                    one correct answer.
-                  </small>
-                </>
-              )}
-              {current.type === QuestionType.fillInBlank && (
-                <>
-                  <small>
-                    Enter your question text, then define all possible correct
-                    answers for the blank.
-                  </small>
-                  <br />
-                  <small>
-                    Students will see the question followed by a small text box
-                    to type their answers.
-                  </small>
-                </>
-              )}
-              {current.type === QuestionType.trueOrFalse && (
-                <>
-                  <small>
-                    Enter your question text, then select if True or False is
-                    the correct answer.
-                  </small>
-                </>
-              )}
-            </>
-
-            {/* Question description editor */}
-            <>
-              <br />
-              <br />
-              <label htmlFor="input-1" className="form-label">
-                <b>Question:</b>
-              </label>
-              <div
-                className="d-flex justify-content-between"
-                style={{ width: "100%" }}
-              >
-                <EditorProvider>
-                  <Editor
-                    containerProps={{
-                      style: { width: "100%", resize: "vertical" },
-                    }}
-                    value={current.question}
-                    onChange={(e) => {
-                      //console.log(e.target.value);
-                      const updatedCurrent = {
-                        ...current,
-                        question: e.target.value,
-                      };
-                      //console.log(updatedCurrent);
-                      setCurrent(updatedCurrent);
-                    }}
-                  >
-                    <Toolbar>
-                      <BtnUndo />
-                      <BtnRedo />
-                      <BtnBold />
-                      <BtnItalic />
-                      <BtnUnderline />
-                      <BtnStrikeThrough />
-                      <BtnBulletList />
-                      <BtnNumberedList />
-                      <BtnLink />
-                      <BtnClearFormatting />
-
-                      <BtnStyles />
-                    </Toolbar>
-                  </Editor>
-                </EditorProvider>
-              </div>
-              <br />
-              <br />
-              <p className="pt-2 border-top" style={{ fontWeight: "bold" }}>
-                Answers:{" "}
-              </p>
-              <br />
-            </>
-
-            {/* Question answer by type */}
-            {current.type === QuestionType.multipleChoice && (
-              <div className="container">
-                <ul className="list-group">
-                  {current.choices?.map((choice: Choice, i) => (
-                    <li key={choice._id} className="list-group-item">
-                      <div className="row py-5">
-                        <div className="col-auto">
-                          <input
-                            className="form-check-input m-2"
-                            type="radio"
-                            id={`label-mcq-${choice._id}`}
-                            name="mcq"
-                            checked={choice.correct}
-                            onChange={() => handleChoiceCorrectChange(i)}
-                          />
-                          <label
-                            className="form-check-label pt-1"
-                            htmlFor={`label-mcq-${choice._id}`}
-                          >
-                            {choice.correct ? (
-                              <p>Correct Answer</p>
-                            ) : (
-                              <p>Possible Answer</p>
-                            )}
-                          </label>
-                        </div>
-                        <div className="col-auto">
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={choice.choice}
-                            onChange={(e) =>
-                              handleChoiceChange(i, e.target.value)
-                            }
-                          />
-                        </div>
-                        <div className="col-auto ">
-                          <button
-                            onClick={() => {
-                              const updatedChoices = current.choices?.filter(
-                                (_, id) => id !== i
-                              );
-                              const updatedCurrent = {
-                                ...current,
-                                choices: updatedChoices,
-                              };
-                              setCurrent(updatedCurrent);
-                            }}
-                            className="btn btn-link p-0"
-                            style={{ color: "inherit" }}
-                          >
-                            <GoTrash />
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  className="btn m-2 float-end border-0"
-                  onClick={() => {
-                    const newChoice: Choice = {
-                      _id: `${current.choices?.length}`,
-                      choice: "",
-                      correct: false,
-                    };
-                    const updatedChoices = [
-                      ...(current.choices || []),
-                      newChoice,
-                    ];
-                    const updatedCurrent = {
-                      ...current,
-                      choices: updatedChoices,
-                    };
-                    setCurrent(updatedCurrent);
-                  }}
-                >
-                  <p className="text-danger">+ Add Another Answer</p>
-                </button>
-                <br />
-                <br />
-              </div>
-            )}
-
-
-            {current.type === QuestionType.fillInBlank && (
-              <div className="container">
-                <ul className="list-group">
-                  {current.blank?.map((blank, i) => (
-                    <li key={i} className="list-group-item">
-                      <div className="row py-5">
-                        <div className="col-auto">
-                          <label
-                            className="form-check-label pt-1"
-                            htmlFor={`label-mcq-${i}`}
-                          >
-                            Possible Answer:
-                          </label>
-                        </div>
-                        <div className="col-auto">
-                          <input
-                            type="text"
-                            className="form-control w-auto"
-                            value={blank || ""}
-                            onChange={(e) => {
-                              handleBlankChange(i, e.target.value);
-                            }}
-                          />
-                        </div>
-                        <div className="col-auto">
-                          <button
-                            onClick={() => {
-                              const updatedBlanks = current.blank?.filter(
-                                (_, _i) => _i !== i
-                              );
-                              const updatedCurrent = {
-                                ...current,
-                                blank: updatedBlanks,
-                              };
-                              setCurrent(updatedCurrent);
-                            }}
-                            className="btn btn-link p-0"
-                            style={{ color: "inherit" }}
-                          >
-                            <GoTrash />
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  className="btn m-2 float-end border-0"
-                  onClick={() => {
-                    const updatedBlanks = [...(current.blank || []), ""];
-                    const updatedCurrent = { ...current, blank: updatedBlanks };
-                    setCurrent(updatedCurrent);
-                  }}
-                >
-                  <p className="text-danger">+ Add Another Answer</p>
-                </button>
-                <br />
-                <br />
-              </div>
-            )}
-
-
-            {current.type === QuestionType.trueOrFalse && (
-              <div className="container">
-                <div className="p-2">
-                  <input
-                    className="form-check-input m-2"
-                    type="radio"
-                    id="label-t"
-                    name="tf"
-                    checked={current.true_or_false}
-                    onChange={() => handleTrueFalseChange(true)}
-                  ></input>
-                  <label className="form-check-label pt-1" htmlFor="label-t">
-                    True
-                  </label>
-                </div>
-                <br />
-                <div className="p-2">
-                  <input
-                    className="form-check-input m-2"
-                    type="radio"
-                    id="label-t"
-                    name="tf"
-                    checked={!current.true_or_false}
-                    onChange={() => handleTrueFalseChange(false)}
-                  ></input>
-                  <label className="form-check-label pt-1" htmlFor="label-f">
-                    False
-                  </label>
-                </div>
-              </div>
-            )}
-            <div className="border-top p-3 mt-3">
-              <button
-                className="btn btn-danger float-end ms-2"
-                onClick={() => {
-                  setIsEditing(false);
-                  onQuestionChange(index, current);
-                  navigate(-1);
-                }}
-              >
-                Update Question
-              </button>
-              <button
-                className="btn btn-secondary float-end"
-                onClick={() => {
-                  setCurrent(question);
-                  setIsEditing(false);
-                  handleCancel();
-                }}
-              > 
-                Cancel
-              </button>
-            </div>
-          </div>
-          <br />
-          <br />
         </div>
+      </div>
+      <hr />
+
+      <div className="container">
+        {/* Tips based on question type */}
+        {current.type === QuestionType.MultipleChoice && (
+          <>
+            <small>
+              Enter your question and multiple answers, then select the one correct answer.
+            </small>
+          </>
+        )}
+        {current.type === QuestionType.FillInTheBlank && (
+          <>
+            <small>Enter your question text, then define all correct answers (accepted blanks).</small>
+          </>
+        )}
+        {current.type === QuestionType.TrueFalse && (
+          <>
+            <small>Select if True or False is correct.</small>
+          </>
+        )}
+
+        <br />
+        <br />
+        <label htmlFor="input-1" className="form-label">
+          <b>Question:</b>
+        </label>
+        <EditorProvider>
+          <Editor
+            containerProps={{ style: { width: "100%", resize: "vertical" } }}
+            value={current.question || ""}
+            onChange={handleEditorChange}
+          >
+            <Toolbar>
+              <BtnUndo />
+              <BtnRedo />
+              <BtnBold />
+              <BtnItalic />
+              <BtnUnderline />
+              <BtnStrikeThrough />
+              <BtnBulletList />
+              <BtnNumberedList />
+              <BtnLink />
+              <BtnClearFormatting />
+              <BtnStyles />
+            </Toolbar>
+          </Editor>
+        </EditorProvider>
+        <br />
+        <br />
+        <p className="pt-2 border-top" style={{ fontWeight: "bold" }}>
+          Answers:
+        </p>
+        <br />
+
+        {/* Multiple Choice */}
+        {current.type === QuestionType.MultipleChoice && (
+          <div className="container">
+            <ul className="list-group">
+              {current.options?.map((option, i) => (
+                <li key={i} className="list-group-item">
+                  <div className="row py-5">
+                    <div className="col-auto">
+                      {/* Radio button for correct answer selection */}
+                      <input
+                        className="form-check-input m-2"
+                        type="radio"
+                        name="mcq"
+                        checked={current.correctAnswers && current.correctAnswers[0] === option}
+                        onChange={() => handleSelectCorrectOption(i)}
+                      />
+                      <label className="form-check-label pt-1">
+                        {current.correctAnswers && current.correctAnswers[0] === option
+                          ? <p>Correct Answer</p>
+                          : <p>Possible Answer</p>}
+                      </label>
+                    </div>
+                    <div className="col-auto">
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={option}
+                        onChange={(e) => handleOptionTextChange(i, e.target.value)}
+                      />
+                    </div>
+                    <div className="col-auto">
+                      <button
+                        onClick={() => handleDeleteOption(i)}
+                        className="btn btn-link p-0"
+                        style={{ color: "inherit" }}
+                      >
+                        <GoTrash />
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <button className="btn m-2 float-end border-0" onClick={handleAddOption}>
+              <p className="text-danger">+ Add Another Option</p>
+            </button>
+            <br />
+            <br />
+          </div>
+        )}
+
+        {/* Fill In The Blank uses correctAnswers as the list of acceptable answers */}
+        {current.type === QuestionType.FillInTheBlank && (
+          <div className="container">
+            <ul className="list-group">
+              {(current.correctAnswers || []).map((answer, i) => (
+                <li key={i} className="list-group-item">
+                  <div className="row py-5">
+                    <div className="col-auto">
+                      <label className="form-check-label pt-1">
+                        Accepted Answer:
+                      </label>
+                    </div>
+                    <div className="col-auto">
+                      <input
+                        type="text"
+                        className="form-control w-auto"
+                        value={answer || ""}
+                        onChange={(e) => handleBlankChange(i, e.target.value)}
+                      />
+                    </div>
+                    <div className="col-auto">
+                      <button
+                        onClick={() => handleDeleteBlank(i)}
+                        className="btn btn-link p-0"
+                        style={{ color: "inherit" }}
+                      >
+                        <GoTrash />
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <button className="btn m-2 float-end border-0" onClick={handleAddBlank}>
+              <p className="text-danger">+ Add Another Answer</p>
+            </button>
+            <br />
+            <br />
+          </div>
+        )}
+
+        {/* True/False */}
+        {current.type === QuestionType.TrueFalse && (
+          <div className="container">
+            <div className="p-2">
+              <input
+                className="form-check-input m-2"
+                type="radio"
+                name="tf"
+                checked={current.correctAnswers && current.correctAnswers[0] === "True"}
+                onChange={() => handleTrueFalseChange(true)}
+              />
+              <label className="form-check-label pt-1">
+                True
+              </label>
+            </div>
+            <br />
+            <div className="p-2">
+              <input
+                className="form-check-input m-2"
+                type="radio"
+                name="tf"
+                checked={current.correctAnswers && current.correctAnswers[0] === "False"}
+                onChange={() => handleTrueFalseChange(false)}
+              />
+              <label className="form-check-label pt-1">
+                False
+              </label>
+            </div>
+          </div>
+        )}
+
+        <div className="border-top p-3 mt-3">
+          <button className="btn btn-success float-end ms-2" onClick={handleSave}>
+            Save Question
+          </button>
+          <button className="btn btn-secondary float-end" onClick={handleCancel}>
+            Cancel
+          </button>
+        </div>
+      </div>
+      <br />
+      <br />
     </div>
   );
 }
