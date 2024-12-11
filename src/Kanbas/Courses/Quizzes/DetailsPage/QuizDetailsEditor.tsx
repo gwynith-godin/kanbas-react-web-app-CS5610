@@ -158,6 +158,21 @@ export default function QuizEditor() {
                         required
                     />
                 </div>
+
+                {/* Quiz Description */}
+                <div className="mb-3">
+                    <label htmlFor="desc" className="form-label">Quiz Description</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="desc"
+                        name="desc"
+                        value={quizData.desc}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+
                 <div className="mb-3">
                     <label htmlFor="quizType" className="form-label">Quiz Type</label>
                     <select
@@ -290,6 +305,19 @@ export default function QuizEditor() {
                         <option value="After Last Attempt">After Last Attempt</option>
                         <option value="Never">Never</option>
                     </select>
+                </div>
+
+                <div className="mb-3">
+                    <label htmlFor="accessCode" className="form-label">Access Code</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="accessCode"
+                        name="accessCode"
+                        value={quizData.accessCode}
+                        onChange={handleChange}
+                        required
+                    />
                 </div>
 
                 <div className="form-check mb-3">
