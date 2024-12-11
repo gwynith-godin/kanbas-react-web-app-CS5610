@@ -84,6 +84,8 @@ export default function QuestionsList() {
     }
   };
 
+  const totalPoints = allQuestions.reduce((sum, question) => sum + (question.points || 0), 0);
+
   return (
     <div>
       <div className="container my-5">
@@ -94,11 +96,14 @@ export default function QuestionsList() {
               className="btn btn-secondary me-2"
               onClick={() => navigate(-1)}
             >
-              Back
+              Details
             </button>
             <button type="button" className="btn btn-primary">
               Questions
             </button>
+          </div>
+          <div className="mb-3">
+            <strong>Total points:</strong> {totalPoints}
           </div>
           {allQuestions.map((question: any) => (
             <div key={question._id} className="col-md-6 mb-4">
@@ -131,11 +136,14 @@ export default function QuestionsList() {
             </div>
           ))}
         </div>
-        <button className="btn btn-outline-primary btn-sm me-2"
-          onClick={handleAddNewQuetion}>
+        <button
+          className="btn btn-outline-primary btn-sm me-2"
+          onClick={handleAddNewQuetion}
+        >
           Add Question
         </button>
       </div>
     </div>
   );
 }
+

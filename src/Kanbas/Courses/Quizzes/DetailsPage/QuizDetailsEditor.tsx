@@ -1,6 +1,22 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import * as client from "../client";
+import {
+    BtnBold,
+    BtnItalic,
+    BtnUnderline,
+    BtnBulletList,
+    BtnNumberedList,
+    BtnLink,
+    BtnStrikeThrough,
+    BtnStyles,
+    BtnRedo,
+    BtnUndo,
+    BtnClearFormatting,
+    Editor,
+    EditorProvider,
+    Toolbar,
+} from "react-simple-wysiwyg";
 
 export default function QuizEditor() {
     const { qid } = useParams<{ qid: string }>();
@@ -24,6 +40,13 @@ export default function QuizEditor() {
         };
         fetchQuiz();
     }, [qid]);
+
+    // RICH TEXT EDITOR HANDLER
+  const handleEditorChange = (e: any) => {
+    setQuizData({
+        ...quizData,
+        desc: e.target.value });
+  };
 
     const handleChange = (
         e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -139,7 +162,7 @@ export default function QuizEditor() {
                     Details
                 </button>
                 <button type="button" className="btn btn-secondary"
-                onClick={() => navigate(`${pathname}/questions`)}>
+                    onClick={() => navigate(`${pathname}/questions`)}>
                     Questions
                 </button>
             </div>
@@ -161,16 +184,30 @@ export default function QuizEditor() {
 
                 {/* Quiz Description */}
                 <div className="mb-3">
-                    <label htmlFor="desc" className="form-label">Quiz Description</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="desc"
-                        name="desc"
-                        value={quizData.desc}
-                        onChange={handleChange}
-                        required
-                    />
+                    <label htmlFor="input-1" className="form-label">
+                        <b>Quiz Description:</b>
+                    </label>
+                    <EditorProvider>
+                        <Editor
+                            containerProps={{ style: { width: "100%", resize: "vertical" } }}
+                            value={quizData.desc || ""}
+                            onChange={handleEditorChange}
+                        >
+                            <Toolbar>
+                                <BtnUndo />
+                                <BtnRedo />
+                                <BtnBold />
+                                <BtnItalic />
+                                <BtnUnderline />
+                                <BtnStrikeThrough />
+                                <BtnBulletList />
+                                <BtnNumberedList />
+                                <BtnLink />
+                                <BtnClearFormatting />
+                                <BtnStyles />
+                            </Toolbar>
+                        </Editor>
+                    </EditorProvider>
                 </div>
 
                 <div className="mb-3">

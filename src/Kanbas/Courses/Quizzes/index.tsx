@@ -20,6 +20,7 @@ import QuizListScreenControls from "./QuizListScreenControls";
 import AdminRestricted from "../../Common/ProtectedRoutes";
 import GreenCheckmark from "../Modules/GreenCheckmark";
 import QuizOptionsMenu from "./QuizOptionsMenu";
+import { getMostRecentAttempt } from "./client";
 
 export default function Quizzes() {
   const { cid } = useParams();
@@ -32,7 +33,21 @@ export default function Quizzes() {
   const fetchQuizzes = async () => {
     try {
       const quizzes = await coursesClient.findQuizzesForCourse(cid as string);
-      dispatch(setQuizzes(quizzes));
+      
+      // Fetch most recent attempts for all quizzes
+      const quizzesWithScores = await Promise.all(
+        quizzes.map(async (quiz: any) => {
+          try {
+            const attempt = await getMostRecentAttempt(currentUser._id, quiz._id);
+            return { ...quiz, score: attempt.score };
+          } catch (error) {
+            console.error(`Failed to fetch attempt for quiz ${quiz._id}:`, error);
+            return { ...quiz, score: null }; // Assign null if there's an error
+          }
+        })
+      );
+  
+      dispatch(setQuizzes(quizzesWithScores));
     } catch (error) {
       console.error("Failed to fetch quizzes:", error);
     }
@@ -106,7 +121,6 @@ export default function Quizzes() {
 
   const handleNewQuiz = () => {
     createNewQuiz();
-    // Optionally navigate to the new quiz's details page
   };
 
   const handlePublishToggle = async (quiz: any) => {
@@ -118,17 +132,15 @@ export default function Quizzes() {
       // Dispatch the updateQuiz action to update the Redux store
       dispatch(updateQuizAction(updatedQuiz));
 
-      // Optionally, you can refetch quizzes or handle the response as needed
       // fetchQuizzes();
     } catch (error) {
       console.error("Failed to update quiz:", error);
-      // Optionally, you can show an error message to the user
     }
   };
 
   useEffect(() => {
     fetchQuizzes();
-  }, [cid]); // Added `cid` as a dependency in case it changes
+  }, [cid]); 
 
   return (
     <div>
@@ -165,6 +177,11 @@ export default function Quizzes() {
                           >
                             {isAvailable ? 'Available' : 'Closed'}
                           </span>
+                          {quiz.score !== null && (
+                  <span className="ms-2 text-muted">
+                    Most Recent Score: {quiz.score}%
+                  </span>
+                )}
                         </li>
                         <li className="wd-assignment-info me-3">
                           <span className="wd-assignment-bold">
