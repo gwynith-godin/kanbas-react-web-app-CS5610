@@ -96,7 +96,7 @@ export default function Quizzes() {
   const clickedOnQuiz = (quiz: any) => {
     if (currentUser.role === "ADMIN" || currentUser.role === 'FACULTY') {
       navigate(`${pathname}/${quiz._id}`);
-    } else if (quiz.published) {
+    } else if (quiz.published && (new Date() <= new Date(quiz.untilDate))) {
       navigate(`${pathname}/${quiz._id}/preview`);
     }
   };
