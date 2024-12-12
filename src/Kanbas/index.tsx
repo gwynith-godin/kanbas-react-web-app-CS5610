@@ -14,12 +14,17 @@ import * as courseClient from "./Courses/client";
 
 
 export default function Kanbas() {
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
     const [courses, setCourses] = useState<any[]>([]);
-    const { currentUser } = useSelector((state: any) => state.accountReducer);
     const [enrolling, setEnrolling] = useState<boolean>(false);
+    
     const findCoursesForUser = async () => {
       try {
+
+        console.log(currentUser)
+
         if (currentUser){
+
         const courses = await userClient.findCoursesForUser(currentUser._id);
         setCourses(courses);}
       } catch (error) {
@@ -109,7 +114,6 @@ export default function Kanbas() {
                   courses={courses}
                   course={course}
                   setCourse={setCourse}
-                  setCourses={setCourses}
                   addNewCourse={addNewCourse}
                   deleteCourse={deleteCourse}
                   updateCourse={updateCourse}

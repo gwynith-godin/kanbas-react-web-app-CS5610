@@ -50,6 +50,7 @@ export default function AssignmentEditor() {
     </div>
     <ul className="list-unstyled large-margin-left">
   {[
+    { label: "Quiz Description", value: quiz.desc },
     { label: "Quiz Type", value: quiz.quizType },
     { label: "Points", value: quiz.points },
     { label: "Assignment Group", value: quiz.assignmentGroup },
@@ -58,6 +59,7 @@ export default function AssignmentEditor() {
     { label: "Multiple Attempts", value: quiz.howManyAttempts },
     { label: "View Responses", value: quiz.viewResponses },
     { label: "Show Correct Answers", value: quiz.showCorrectAnswers },
+    { label: "Access Code", value: quiz.accessCode },
     { label: "One Question at a Time", value: quiz.oneQuestionAtATime },
     { label: "Require Respondus LockDown Browser", value: quiz.requireLockdownBrowser },
     { label: "Required to View Quiz Results", value: quiz.requiredToViewResults },

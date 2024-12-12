@@ -19,6 +19,7 @@ export const signin = async (credentials: any) => {
 };
 
 export const signup = async (user: any) => {
+    console.log(user)
     const response = await axiosWithCredentials.post(`${USERS_API}/signup`, user);
     return response.data;
   };
@@ -50,7 +51,9 @@ export const signout = async () => {
 };
 
 export const findAllUsers = async () => {
+  console.log("MADE IT HERE", USERS_API)
   const response = await axiosWithCredentials.get(USERS_API);
+  console.log(response.data);
   return response.data;
 };
 

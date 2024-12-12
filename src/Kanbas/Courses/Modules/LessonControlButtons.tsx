@@ -6,7 +6,7 @@ const LessonControlButtons = () => {
   return (
     <div className="float-end">
       <GreenCheckmark />
-      <IoEllipsisVertical className="fs-4" />
+      
     </div>
   );
 };
@@ -15,7 +15,6 @@ const LessonControlButtonsLight = () => {
   return (
     <div className="float-end">
       <LightGreenCheckmark />
-      <IoEllipsisVertical className="fs-4" />
     </div>
   );
 };

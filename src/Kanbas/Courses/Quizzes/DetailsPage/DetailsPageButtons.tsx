@@ -5,11 +5,13 @@ import { IoEllipsisVertical } from "react-icons/io5";
 import * as client from "../client";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 export default function DetailsPageButtons(){
     const { qid } = useParams();
     const [quiz, setQuiz] = useState<any>({});
+    const { pathname } = useLocation();
+    const navigate = useNavigate();
     
     const fetchQuiz = async () => {
         if (!qid) return;
@@ -28,15 +30,15 @@ export default function DetailsPageButtons(){
         <button
           id="wd-preview-btn"
           className="btn btn-lg btn-secondary me-1"
-        //   onClick={handleNewAssignment}
+          onClick={() => navigate(`${pathname}/preview`)}
         >
           Preview
         </button>
         <button
           id="wd-preview-btn"
           className="btn btn-lg btn-secondary me-1"
-          onClick={() => alert(qid)}
-        //   onClick={() => editQuiz(qid)}
+          //onClick={() => alert(qid)}
+          onClick={() => navigate(`${pathname}/edit`)}
         >
         <FaPencil
           className="text-danger me-2 mb-1"
