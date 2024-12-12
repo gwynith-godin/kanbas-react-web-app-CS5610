@@ -87,6 +87,7 @@ export default function Dashboard(
                 style={{ width: "300px" }}
               >
                 <div className="card rounded-3 overflow-hidden">
+                  
 
                   <img
                     src="/images/reactjs.jpg"
@@ -96,6 +97,21 @@ export default function Dashboard(
                   />
                   <div className="card-body">
                     <h5 className="wd-dashboard-course-title card-title">
+
+                  <Link
+                    className="wd-dashboard-course-link text-decoration-none text-dark"
+                    to={`/Kanbas/Courses/${course._id}/Home`}
+                    key={`/Kanbas/Courses/${course._id}/Home`}
+                  >
+                    <img
+                      src={`/images/reactjs.jpg`}
+                      alt=""
+                      width="100%"
+                      height={160}
+                    />
+                    <div className="card-body">
+                      <h5 className="wd-dashboard-course-title card-title">
+
                       {enrolling && (
                         <button onClick={(event) => {
                           event.preventDefault();

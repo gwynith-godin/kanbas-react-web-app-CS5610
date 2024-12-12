@@ -45,12 +45,12 @@ export default function TOC() {
         </a>
       </li>
       <li className="nav-item">
-        <a id="wd-k" href="https://github.com/gwynith-godin/kanbas-react-web-app-CS5610" className="nav-link">
-          My GitHub
+        <a id="wd-k" href="https://github.com/gwynith-godin/kanbas-react-web-app-CS5610/tree/quizzes" className="nav-link">
+          Kanbas Quizzes GitHub
         </a>
       </li>
       <li className="nav-item">
-        <a id="wd-k" href="https://kanbas-node-server-app-godin-69af0d1824fe.herokuapp.com/" className="nav-link">
+        <a id="wd-k" href="https://kanbas-quizzes-f018cd52ff3f.herokuapp.com" className="nav-link">
           HerokuApp
         </a>
       </li>

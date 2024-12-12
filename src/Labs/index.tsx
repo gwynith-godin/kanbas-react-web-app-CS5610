@@ -14,7 +14,7 @@ export default function Labs() {
     <div className = "container-fluid">
         <h1>Gwynith Godin</h1>
         <h3>CS5610-02</h3>
-        <h1>Labs</h1>
+        <h1>Links</h1>
         <TOC />
       <Routes>
         <Route path="/" element={<Navigate to="Labs" />} />
@@ -24,6 +24,15 @@ export default function Labs() {
         <Route path="Lab4/*" element={<Lab4 />} />
         <Route path="Lab5/*" element={<Lab5 />} />
       </Routes>
+    </div>
+    <hr />
+    <div>
+      <h3>Kanbas Quizzes Final Project:</h3>
+      <ul>
+      <li>Gwynith Godin</li>
+      <li>Kaden Casanave</li>
+      <li>Nestor Ivan Apaza Mamani</li>
+      </ul>
     </div>
     </Provider>
     );
