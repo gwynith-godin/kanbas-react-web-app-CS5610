@@ -34,7 +34,7 @@ export default function AssignmentEditor() {
     description: '',
     availableFrom: '',
     due: '',
-    points: '',
+    points: 0,
   });
   console.log(formValues)
 
@@ -52,7 +52,7 @@ export default function AssignmentEditor() {
         description: assignment.description || '',
         availableFrom: assignment.availableFrom || '',
         due: assignment.due || '',
-        points: assignment.points || '',
+        points: assignment.points || 0,
       });
     }
   }, [assignment]);
@@ -135,10 +135,11 @@ export default function AssignmentEditor() {
                 <div className="col-sm-12 d-flex justify-content-end">
                   <label className="me-3">Points</label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control p-6 mb-3"
                     id="assignment-points"
-                    defaultValue={formValues.points}
+                    name="points"
+                    value={formValues.points}
                     onChange={handleNumericInputChange}
                     style={{ width: "350px" }}
                   />

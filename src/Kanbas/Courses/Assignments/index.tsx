@@ -118,6 +118,7 @@ export default function Assignments (){
         {assignments
           // .filter((assignment: any) => assignment.course === cid)
           .map((assignment: any) => (
+            console.log("points", assignment.points),
             <li className="wd-lesson list-group-item p-3 ps-1 d-flex justify-content-between align-items-center"
                   key={assignment._id}
                   onClick={() => handleEditAssignment(assignment)}
